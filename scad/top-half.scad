@@ -16,7 +16,9 @@ module top_half() {
     // 上半 Boss 柱
     top_boss_od = BOSS_DIAMETER;
     top_boss_id = SCREW_CLEARANCE;
-    boss_h = half_h - 0.5;
+    // 缩短在分型面端（Z=0.5起），靠壳壁端齐平（到Z=9）
+    boss_base = 0.5;
+    boss_h = half_h;
 
     difference() {
         union() {
@@ -43,28 +45,29 @@ module top_half() {
             // ===== 线缆锯齿压紧（上半，齿尖向下，2齿）=====
             cable_clamp_teeth_top();
 
-            // ===== Boss 柱 ×4（缩短0.5mm留缝隙）=====
+            // ===== Boss 柱 ×4（分型面端缩0.5mm，壳壁端齐平）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
-                translate([sx * BOSS_X, sy * BOSS_Y, 0])
+                bh = boss_h - boss_base;
+                translate([sx * BOSS_X, sy * BOSS_Y, boss_base])
                     difference() {
                         union() {
                             cylinder(d = top_boss_od,
-                                     h = boss_h - BOSS_REINFORCE_H, $fn = 32);
-                            translate([0, 0, boss_h - BOSS_REINFORCE_H])
+                                     h = bh - BOSS_REINFORCE_H, $fn = 32);
+                            translate([0, 0, bh - BOSS_REINFORCE_H])
                                 cylinder(d1 = top_boss_od,
                                          d2 = BOSS_REINFORCE_OD,
                                          h  = BOSS_REINFORCE_H, $fn = 32);
                         }
                         translate([0, 0, -0.1])
                             cylinder(d = top_boss_id,
-                                     h = boss_h + 0.2, $fn = 32);
+                                     h = bh + 0.2, $fn = 32);
                     }
             }
         }
 
-        // ===== 锥形沉头孔 =====
+        // ===== 锥形沉头孔（从壳壁外表面向下打通）=====
         for (sx = [-1, 1], sy = [-1, 1]) {
-            translate([sx * BOSS_X, sy * BOSS_Y, boss_h - 0.3])
+            translate([sx * BOSS_X, sy * BOSS_Y, half_h - 0.3])
                 cylinder(d1 = SCREW_CLEARANCE,
                          d2 = SCREW_HEAD_DIAMETER,
                          h  = WALL_THICKNESS + 0.6, $fn = 32);
