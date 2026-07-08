@@ -10,7 +10,7 @@ TOOTH_BASE_X    = 4.0;   // 齿底宽 X向
 TOOTH_TOP_X     = 1.5;   // 齿顶平台宽
 TOOTH_GAP       = 4.0;   // 上下齿尖间隙
 TOOTH_SPACING   = 4.0;   // 齿间距 X向
-TOOTH_FIRST_X   = 3.0;   // 第一齿距内端面（防止齿底超出外壳）
+TOOTH_FIRST_X   = 4.0;   // 第一齿距内端面
 
 module cable_clamp_teeth_bottom() {
     half_h = BOX_HALF_INNER_H;

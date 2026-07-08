@@ -17,8 +17,8 @@ CABLE_STRIP_LENGTH  = 20.0;     // 剥线长度（电阻 + 焊接区域）
 
 // ---- 壳体参数 ----
 WALL_THICKNESS      = 1.6;      // 壁厚 mm（FDM 0.4mm 喷嘴 × 4 层）
-BOX_INNER_LENGTH    = 50.0;     // 内部长度 mm
-BOX_INNER_WIDTH     = 20.0;     // 内部宽度 mm
+BOX_INNER_LENGTH    = 60.0;     // 内部长度 mm (+10)
+BOX_INNER_WIDTH     = 25.0;     // 内部宽度 mm (+5)
 BOX_INNER_HEIGHT    = 18.0;     // 内部总高度 mm（= 每半 9mm）
 
 // 导出尺寸
@@ -35,8 +35,8 @@ BOSS_DIAMETER       = 5.0;      // Boss 柱外径
 BOSS_PILOT_HOLE     = 1.7;      // M2 自攻导孔直径
 BOSS_REINFORCE_OD   = 8.0;      // Boss 柱根部加固外径
 BOSS_REINFORCE_H     = 3.0;      // 锥形加固段高度
-BOSS_X              = 17.0;     // Boss 柱 X 偏移（距中心，给挡柱留空间）
-BOSS_Y              = 7.0;      // Boss 柱 Y 偏移（距中心）
+BOSS_X              = 22.0;     // Boss 柱 X 偏移（距中心）
+BOSS_Y              = 9.0;      // Boss 柱 Y 偏移（距中心）
 SCREW_CLEARANCE     = 2.3;      // 上半壳体螺丝通孔
 SCREW_HEAD_DIAMETER = 5.0;      // 沉头孔直径（M2 pan head）
 SCREW_HEAD_DEPTH    = 1.8;      // 沉头孔深度
