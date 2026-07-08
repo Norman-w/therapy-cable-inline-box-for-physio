@@ -24,7 +24,7 @@ module cable_clamp_teeth_bottom() {
             tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - i * TOOTH_SPACING;
             // 齿底在 Z=-9, 尖在 Z=-2
             translate([mx * tx, 0, -half_h])
-                _tooth(bw, tw, tooth_h, w, mx < 0);
+                _tooth(bw, tw, tooth_h, w, mx < 0, invert = false);
         }
     }
 }
@@ -41,22 +41,21 @@ module cable_clamp_teeth_top() {
             tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - i * TOOTH_SPACING;
             // 齿尖在 Z=+2, 底在 Z=+9
             translate([mx * tx, 0, TOOTH_GAP/2])
-                _tooth(bw, tw, tooth_h, w, mx < 0);
+                _tooth(bw, tw, tooth_h, w, mx < 0, invert = true);
         }
     }
 }
 
 // hull 两块矩形板 = 梯形棱柱，自动水密
-// 立面在 X=0（朝中心），斜面朝外
-module _tooth(bw, tw, h, w, mirror_x) {
-    x0 = mirror_x ? -bw : 0;      // 镜像时底从 -bw 到 0
-    xt = mirror_x ? -tw : 0;      // 镜像时顶从 -tw 到 0
+// invert=false: 底宽顶窄（下半齿：宽在壳壁，窄在齿尖）
+// invert=true:  底窄顶宽（上半齿：窄在齿尖，宽在壳壁）
+module _tooth(bw, tw, h, w, mirror_x, invert = false) {
+    x0 = mirror_x ? -bw : 0;
+    xt = mirror_x ? -tw : 0;
     hull() {
-        // 底面宽板
-        translate([x0, -w/2, 0])
-            cube([bw, w, 0.01]);
-        // 顶面窄板（平顶）
-        translate([xt, -w/2, h - 0.01])
-            cube([tw, w, 0.01]);
+        translate([invert ? xt : x0, -w/2, 0])
+            cube([invert ? tw : bw, w, 0.01]);
+        translate([invert ? x0 : xt, -w/2, h - 0.01])
+            cube([invert ? bw : tw, w, 0.01]);
     }
 }
