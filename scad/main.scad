@@ -16,7 +16,7 @@ include <bottom-half.scad>
 include <top-half.scad>
 
 // ===== 渲染模式 =====
-RENDER = "assembly";  // "bottom" | "top" | "assembly"
+RENDER = "assembly";  // "bottom" | "top" | "assembly" | "flat"
 
 // ===== 装配视图间距 =====
 ASSEMBLY_GAP = 18;  // 上下壳体分离间距 mm
@@ -30,6 +30,13 @@ if (RENDER == "bottom") {
 } else if (RENDER == "top") {
     // 导出模式：仅上半壳体（自然方向）
     top_half();
+} else if (RENDER == "flat") {
+    // 合并打印：两半壳体平放在 XY 平面
+    translate([0, -BOX_OUTER_WIDTH/2 - 5, 0])
+        bottom_half();
+    translate([0,  BOX_OUTER_WIDTH/2 + 5, 0])
+        rotate([180, 0, 0])
+            top_half();
 } else {
     // 装配视图：上下壳体分开展示
     assembly_view();

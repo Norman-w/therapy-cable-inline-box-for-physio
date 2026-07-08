@@ -6,454 +6,162 @@
 <title>therapy-cable-inline-box-for-physio — 3D 预览</title>
 <style>
   * { margin: 0; padding: 0; box-sizing: border-box; }
-  body {
-    background: #1a1a2e;
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    overflow: hidden;
-    height: 100vh;
-  }
+  body { background: #1a1a2e; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow: hidden; height: 100vh; }
   #canvas-container { width: 100vw; height: 100vh; }
-
-  /* Info panel */
-  .info-panel {
-    position: fixed;
-    top: 16px;
-    left: 16px;
-    background: rgba(22, 22, 44, 0.92);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 12px;
-    padding: 16px 20px;
-    color: #e0e0e0;
-    z-index: 10;
-    font-size: 13px;
-    line-height: 1.6;
-    pointer-events: none;
-  }
-  .info-panel h1 {
-    font-size: 16px;
-    font-weight: 600;
-    color: #ffffff;
-    margin-bottom: 6px;
-  }
-  .info-panel .subtitle {
-    color: #8899aa;
-    font-size: 11px;
-  }
-  .info-panel .stats {
-    margin-top: 10px;
-    font-family: "SF Mono", "Fira Code", monospace;
-    font-size: 11px;
-    color: #99aabb;
-  }
+  .info-panel { position: fixed; top: 16px; left: 16px; background: rgba(22,22,44,0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; color: #e0e0e0; z-index: 10; font-size: 13px; line-height: 1.6; pointer-events: none; }
+  .info-panel h1 { font-size: 16px; font-weight: 600; color: #fff; margin-bottom: 6px; }
+  .info-panel .subtitle { color: #8899aa; font-size: 11px; }
+  .info-panel .stats { margin-top: 10px; font-family: monospace; font-size: 11px; color: #99aabb; }
   .info-panel .stats span { color: #ffd166; }
-
-  /* Model switcher */
-  .switcher {
-    margin-top: 10px;
-    display: flex;
-    gap: 6px;
-  }
-  .switcher button {
-    pointer-events: auto;
-    background: rgba(255,255,255,0.08);
-    border: 1px solid rgba(255,255,255,0.12);
-    color: #aabbcc;
-    padding: 5px 12px;
-    border-radius: 6px;
-    cursor: pointer;
-    font-size: 11px;
-    transition: all 0.2s;
-  }
-  .switcher button:hover {
-    background: rgba(255,255,255,0.16);
-    color: #fff;
-    border-color: rgba(255,255,255,0.25);
-  }
-  .switcher button.active {
-    background: rgba(255,209,102,0.15);
-    border-color: #ffd166;
-    color: #ffd166;
-  }
-
-  /* Controls hint */
-  .hint {
-    position: fixed;
-    bottom: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    background: rgba(22, 22, 44, 0.85);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 8px 20px;
-    color: #667788;
-    font-size: 11px;
-    z-index: 10;
-    transition: opacity 1.5s;
-  }
-
-  /* Loading */
-  .loading {
-    position: fixed;
-    top: 50%;
-    left: 50%;
-    transform: translate(-50%, -50%);
-    color: #8899aa;
-    font-size: 14px;
-    z-index: 100;
-  }
+  .switcher { margin-top: 10px; display: flex; gap: 6px; }
+  .switcher button { pointer-events: auto; background: rgba(255,255,255,0.08); border: 1px solid rgba(255,255,255,0.12); color: #aabbcc; padding: 6px 14px; border-radius: 6px; cursor: pointer; font-size: 12px; transition: all 0.2s; }
+  .switcher button:hover { background: rgba(255,255,255,0.16); color: #fff; }
+  .switcher button.active { background: rgba(255,209,102,0.15); border-color: #ffd166; color: #ffd166; }
+  .dl-panel { position: fixed; top: 16px; right: 16px; background: rgba(22,22,44,0.92); backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.08); border-radius: 12px; padding: 16px 20px; color: #e0e0e0; z-index: 10; font-size: 12px; min-width: 170px; }
+  .dl-panel h2 { font-size: 13px; font-weight: 600; color: #fff; margin-bottom: 10px; }
+  .dl-panel a { text-decoration: none; display: block; margin-bottom: 6px; }
+  .dl-panel a button { width: 100%; padding: 8px 12px; font-size: 12px; cursor: pointer; background: rgba(100,180,255,0.12); border: 1px solid rgba(100,180,255,0.2); color: #aaccff; border-radius: 6px; transition: all 0.2s; }
+  .dl-panel a button:hover { background: rgba(100,180,255,0.25); color: #fff; }
+  .dl-panel a.flat button { background: rgba(255,180,100,0.12); border-color: rgba(255,180,100,0.2); color: #ffcc88; }
+  .dl-panel a.flat button:hover { background: rgba(255,180,100,0.25); color: #fff; }
+  .hint { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(22,22,44,0.85); backdrop-filter: blur(8px); border: 1px solid rgba(255,255,255,0.06); border-radius: 20px; padding: 8px 20px; color: #667788; font-size: 11px; z-index: 10; }
+  .loading { position: fixed; top: 50%; left: 50%; transform: translate(-50%,-50%); color: #8899aa; font-size: 14px; z-index: 100; }
   .loading.hidden { display: none; }
-
-  /* Drop zone */
-  .drop-zone {
-    position: fixed;
-    top: 20px;
-    right: 20px;
-    background: rgba(22, 22, 44, 0.88);
-    backdrop-filter: blur(12px);
-    border: 2px dashed rgba(255,255,255,0.15);
-    border-radius: 12px;
-    padding: 24px 32px;
-    color: #8899aa;
-    font-size: 12px;
-    text-align: center;
-    cursor: pointer;
-    z-index: 10;
-    transition: border-color 0.3s;
-  }
-  .drop-zone:hover { border-color: rgba(255,255,255,0.35); color: #aabbcc; }
-  .drop-zone.drag-over { border-color: #ffd166; background: rgba(255,209,102,0.08); }
 </style>
 </head>
 <body>
-
 <div class="info-panel">
   <h1>🧊 therapy-cable-inline-box-for-physio</h1>
   <div class="subtitle">理疗仪线缆串联电阻保护盒</div>
-  <div class="stats">
-    Model: <span id="model-name">—</span><br>
-    Triangles: <span id="tri-count">—</span><br>
-    Size: <span id="bbox-size">—</span>
-  </div>
+  <div class="stats">Model: <span id="model-name">—</span><br>Triangles: <span id="tri-count">—</span><br>Size: <span id="bbox-size">—</span></div>
   <div class="switcher">
     <button id="btn-bottom" onclick="switchModel('bottom')">🔽 下半</button>
-    <button id="btn-top"    onclick="switchModel('top')">🔼 上半</button>
-  </div>
-  <div class="switcher" style="margin-top:4px">
-    <a id="dl-bottom" href="#" download style="text-decoration:none">
-      <button style="font-size:10px">📥 下半 STL</button>
-    </a>
-    <a id="dl-top" href="#" download style="text-decoration:none">
-      <button style="font-size:10px">📥 上半 STL</button>
-    </a>
+    <button id="btn-top" onclick="switchModel('top')">🔼 上半</button>
+    <button id="btn-merged" onclick="switchModel('merged')">🔗 合并</button>
   </div>
 </div>
-
-<div class="drop-zone" id="drop-zone">
-  📁 拖放 .stl 文件到这里<br>
-  <span style="font-size:10px;color:#556677">或点击选择文件</span>
-  <input type="file" id="file-input" accept=".stl" style="display:none">
+<div class="dl-panel">
+  <h2>📥 下载 STL</h2>
+  <a id="dl-bottom" href="#"><button>🔽 下半壳体</button></a>
+  <a id="dl-top" href="#"><button>🔼 上半壳体</button></a>
+  <a id="dl-flat" class="flat" href="#"><button>📦 合并打印（双件平放）</button></a>
 </div>
-
-<div class="hint" id="hint">🖱 左键旋转 &nbsp;|&nbsp; 滚轮缩放 &nbsp;|&nbsp; 右键平移</div>
-
+<div class="hint" id="hint">🖱 左键旋转 | 滚轮缩放 | 右键平移</div>
 <div class="loading" id="loading">加载模型中...</div>
-
 <div id="canvas-container"></div>
-
 <script type="importmap">
-{
-  "imports": {
-    "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
-    "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
-  }
-}
+{ "imports": { "three": "https://unpkg.com/three@0.160.0/build/three.module.js", "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/" } }
 </script>
-
 <script type="module">
 import * as THREE from 'three';
 import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
 import { STLLoader } from 'three/addons/loaders/STLLoader.js';
 
-// --- Scene setup ---
 const container = document.getElementById('canvas-container');
 const scene = new THREE.Scene();
-
-// Gradient background
-const bgColor = new THREE.Color(0x1a1a2e);
-scene.background = bgColor;
+scene.background = new THREE.Color(0x1a1a2e);
 scene.fog = new THREE.Fog(0x1a1a2e, 60, 200);
-
-// Camera
-const camera = new THREE.PerspectiveCamera(45, container.clientWidth / container.clientHeight, 0.5, 500);
-camera.position.set(40, 30, 50);
-camera.lookAt(0, 0, 0);
-
-// Renderer
+const camera = new THREE.PerspectiveCamera(45, container.clientWidth/container.clientHeight, 0.5, 500);
+camera.position.set(40, 30, 50); camera.lookAt(0,0,0);
 const renderer = new THREE.WebGLRenderer({ antialias: true });
 renderer.setSize(container.clientWidth, container.clientHeight);
-renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+renderer.setPixelRatio(Math.min(window.devicePixelRatio,2));
 renderer.shadowMap.enabled = true;
 renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 1.2;
 container.appendChild(renderer.domElement);
 
-// --- Lighting ---
-// Ambient
-const ambient = new THREE.AmbientLight(0x8899bb, 3.5); // brighter
-scene.add(ambient);
+const ambient = new THREE.AmbientLight(0x8899bb, 3.5); scene.add(ambient);
+const keyLight = new THREE.DirectionalLight(0xffeedd, 5); keyLight.position.set(20,40,30);
+keyLight.castShadow = true; keyLight.shadow.mapSize.width = 2048; keyLight.shadow.mapSize.height = 2048;
+keyLight.shadow.camera.near = 0.5; keyLight.shadow.camera.far = 200;
+keyLight.shadow.camera.left = -50; keyLight.shadow.camera.right = 50;
+keyLight.shadow.camera.top = 50; keyLight.shadow.camera.bottom = -50;
+keyLight.shadow.bias = -0.0001; scene.add(keyLight);
+const fillLight = new THREE.DirectionalLight(0xaaccff, 3); fillLight.position.set(-15,15,-10); scene.add(fillLight);
+const rimLight = new THREE.DirectionalLight(0xffffff, 3); rimLight.position.set(0,-5,-30); scene.add(rimLight);
+const bottomLight = new THREE.DirectionalLight(0x8899cc, 2.5); bottomLight.position.set(0,-20,0); scene.add(bottomLight);
+const gridHelper = new THREE.GridHelper(80, 20, 0x334455, 0x222244); gridHelper.position.y = -20; scene.add(gridHelper);
 
-// Key light (warm white)
-const keyLight = new THREE.DirectionalLight(0xffeedd, 5);
-keyLight.position.set(20, 40, 30);
-keyLight.castShadow = true;
-keyLight.shadow.mapSize.width = 2048;
-keyLight.shadow.mapSize.height = 2048;
-keyLight.shadow.camera.near = 0.5;
-keyLight.shadow.camera.far = 200;
-keyLight.shadow.camera.left = -50;
-keyLight.shadow.camera.right = 50;
-keyLight.shadow.camera.top = 50;
-keyLight.shadow.camera.bottom = -50;
-keyLight.shadow.bias = -0.0001;
-scene.add(keyLight);
-
-// Fill light (cool blue)
-const fillLight = new THREE.DirectionalLight(0xaaccff, 3);
-fillLight.position.set(-15, 15, -10);
-scene.add(fillLight);
-
-// Rim light
-const rimLight = new THREE.DirectionalLight(0xffffff, 3);
-rimLight.position.set(0, -5, -30);
-scene.add(rimLight);
-
-	// Bottom fill
-	const bottomLight = new THREE.DirectionalLight(0x8899cc, 2.5);
-	bottomLight.position.set(0, -20, 0);
-	scene.add(bottomLight);
-
-// --- Grid floor ---
-const gridHelper = new THREE.GridHelper(80, 20, 0x334455, 0x222244);
-gridHelper.position.y = -20;
-scene.add(gridHelper);
-
-// --- Controls ---
 const controls = new OrbitControls(camera, renderer.domElement);
-controls.enableDamping = true;
-controls.dampingFactor = 0.08;
-controls.minDistance = 5;
-controls.maxDistance = 150;
-controls.target.set(0, 0, 0);
-controls.update();
+controls.enableDamping = true; controls.dampingFactor = 0.08;
+controls.minDistance = 5; controls.maxDistance = 150; controls.target.set(0,0,0); controls.update();
 
-// --- Model storage ---
-let currentModel = null;
+const STL_BASE = (() => { const p = window.location.pathname; return p.replace(/\/(web\/)?(index\.html)?$/,'').replace(/\/+$/,''); })();
+const TS = '?v=' + Date.now();
+const URLS = { bottom: STL_BASE+'/stl/bottom-half.stl'+TS, top: STL_BASE+'/stl/top-half.stl'+TS, flat: STL_BASE+'/stl/flat-both.stl'+TS };
+document.getElementById('dl-bottom').href = URLS.bottom;
+document.getElementById('dl-top').href = URLS.top;
+document.getElementById('dl-flat').href = URLS.flat;
+
+let models = [];
 const loader = new STLLoader();
+const MAT_B = new THREE.MeshPhysicalMaterial({ color: 0xeeddcc, metalness: 0.05, roughness: 0.45, clearcoat: 0.1, clearcoatRoughness: 0.2 });
+const MAT_T = new THREE.MeshPhysicalMaterial({ color: 0x88bbdd, metalness: 0.05, roughness: 0.45, clearcoat: 0.1, clearcoatRoughness: 0.2, transparent: true, opacity: 0.85 });
 
-function loadSTL(url, name = 'model.stl') {
-  const loadingEl = document.getElementById('loading');
-  loadingEl.classList.remove('hidden');
-
-  loader.load(
-    url,
-    (geometry) => {
-      // Remove old model
-      if (currentModel) scene.remove(currentModel);
-
-      // Compute smooth normals
-      geometry.computeVertexNormals();
-
-      // Center geometry
-      geometry.center();
-      geometry.computeBoundingBox();
-      const bbox = geometry.boundingBox;
-      const size = new THREE.Vector3();
-      bbox.getSize(size);
-
-      // Material — slightly translucent plastic look
-      const material = new THREE.MeshPhysicalMaterial({
-        color: 0x88bbdd,
-        metalness: 0.05,
-        roughness: 0.45,
-        clearcoat: 0.1,
-        clearcoatRoughness: 0.2,
-        flatShading: false,
-      });
-
-      // Wireframe overlay for detail
-      const wireframeMat = new THREE.MeshBasicMaterial({
-        color: 0x334466,
-        wireframe: true,
-        transparent: true,
-        opacity: 0.08,
-      });
-
-      const mesh = new THREE.Mesh(geometry, material);
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-
-      const wireframe = new THREE.Mesh(geometry, wireframeMat);
-      mesh.add(wireframe);
-
-      scene.add(mesh);
-      currentModel = mesh;
-
-      // Update camera
-      const maxDim = Math.max(size.x, size.y, size.z);
-      camera.position.set(maxDim * 1.6, maxDim * 1.2, maxDim * 1.6);
-      controls.target.set(0, 0, 0);
-      controls.update();
-
-      // Update panel
-      document.getElementById('model-name').textContent = name;
-      document.getElementById('tri-count').textContent =
-        geometry.index
-          ? (geometry.index.count / 3).toLocaleString()
-          : (geometry.attributes.position.count / 3).toLocaleString();
-      document.getElementById('bbox-size').textContent =
-        `${size.x.toFixed(1)} × ${size.y.toFixed(1)} × ${size.z.toFixed(1)} mm`;
-
-      loadingEl.classList.add('hidden');
-    },
-    (progress) => {
-      if (progress.total > 0) {
-        loadingEl.textContent = `加载中... ${Math.round(progress.loaded / progress.total * 100)}%`;
-      }
-    },
-    (error) => {
-      const msg = error?.message || error?.toString?.() || '未知错误';
-      loadingEl.textContent = '加载失败 — ' + msg;
-      console.error('STL load error:', error, 'url:', url);
-    }
-  );
+function clearModels() { models.forEach(m => scene.remove(m)); models = []; }
+function addModel(geo, mat, pos) {
+  geo.computeVertexNormals();
+  const mesh = new THREE.Mesh(geo, mat); mesh.castShadow = true; mesh.receiveShadow = true;
+  mesh.position.copy(pos);
+  const wf = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ color:0x334466, wireframe:true, transparent:true, opacity:0.06 }));
+  mesh.add(wf); scene.add(mesh); models.push(mesh); return mesh;
+}
+function fitCamera() {
+  const box = new THREE.Box3(); models.forEach(m => box.expandByObject(m));
+  const s = box.getSize(new THREE.Vector3()); const c = box.getCenter(new THREE.Vector3());
+  const d = Math.max(s.x,s.y,s.z);
+  camera.position.copy(c.clone().add(new THREE.Vector3(d*1.4, d*1.0, d*1.6)));
+  controls.target.copy(c); controls.update();
+  document.getElementById('bbox-size').textContent = `${s.x.toFixed(1)} × ${s.y.toFixed(1)} × ${s.z.toFixed(1)} mm`;
 }
 
-// --- Model switching ---
-// 从当前页面路径推导 STL 基础路径（兼容 nginx 子路径、本地开发等部署场景）
-const STL_BASE = (() => {
-  const p = window.location.pathname;
-  // 去掉 /web/index.html 或 /web/ 或 /index.html 后缀，保留部署前缀
-  const base = p.replace(/\/(web\/)?(index\.html)?$/, '').replace(/\/+$/, '');
-  return base;
-})();
-// 加时间戳破浏览器缓存
-const STL_TS = '?v=' + Date.now();
-const MODEL_URLS = {
-  bottom: { url: STL_BASE + '/stl/bottom-half.stl' + STL_TS, name: '下半壳体' },
-  top:    { url: STL_BASE + '/stl/top-half.stl'    + STL_TS, name: '上半壳体' },
-};
+const lel = document.getElementById('loading');
+function loadOne(url, mat, pos, label, cb) {
+  lel.classList.remove('hidden'); lel.textContent = '加载中...';
+  loader.load(url, (geo) => {
+    addModel(geo, mat, pos);
+    document.getElementById('tri-count').textContent = (geo.index?geo.index.count/3:geo.attributes.position.count/3).toLocaleString();
+    document.getElementById('model-name').textContent = label;
+    if (cb) cb(geo);
+    lel.classList.add('hidden');
+  }, (p) => { if (p.total>0) lel.textContent = `加载中... ${Math.round(p.loaded/p.total*100)}%`; },
+  (err) => { lel.textContent = '加载失败 — '+(err?.message||err); console.error(err); });
+}
 
-// 设置下载链接
-document.getElementById('dl-bottom').href = MODEL_URLS.bottom.url;
-document.getElementById('dl-top').href    = MODEL_URLS.top.url;
-
+const BTN_B = document.getElementById('btn-bottom'), BTN_T = document.getElementById('btn-top'), BTN_M = document.getElementById('btn-merged');
 window.switchModel = function(part) {
-  const m = MODEL_URLS[part];
-  if (!m) { console.warn('Unknown model part:', part); return; }
-  console.log('Loading STL:', m.url);
-  loadSTL(m.url, m.name);
-  document.getElementById('btn-bottom').classList.toggle('active', part === 'bottom');
-  document.getElementById('btn-top').classList.toggle('active', part === 'top');
+  clearModels();
+  BTN_B.classList.toggle('active', part==='bottom');
+  BTN_T.classList.toggle('active', part==='top');
+  BTN_M.classList.toggle('active', part==='merged');
+  if (part === 'bottom') {
+    loadOne(URLS.bottom, MAT_B, new THREE.Vector3(0,0,0), '下半壳体', fitCamera);
+  } else if (part === 'top') {
+    loadOne(URLS.top, MAT_T, new THREE.Vector3(0,0,0), '上半壳体', fitCamera);
+  } else if (part === 'merged') {
+    lel.classList.remove('hidden'); lel.textContent = '加载合并模型...';
+    let n=0; const geos=[];
+    function done() { n++; if(n===2){ fitCamera(); document.getElementById('model-name').textContent='合并装配'; lel.classList.add('hidden'); } }
+    loader.load(URLS.bottom, (g)=>{ geos.push(g); addModel(g, MAT_B, new THREE.Vector3(0,0,0)); done(); }, null, done);
+    loader.load(URLS.top,    (g)=>{ geos.push(g); addModel(g, MAT_T, new THREE.Vector3(0,0,0)); done(); }, null, done);
+  }
 };
 
-// --- File handling ---
-const dropZone = document.getElementById('drop-zone');
-const fileInput = document.getElementById('file-input');
-const hint = document.getElementById('hint');
+(async function(){
+  try { const r = await fetch(URLS.bottom, {method:'HEAD'}); if(r.ok){ switchModel('bottom'); return; } } catch(e){}
+  lel.textContent = '模型加载失败，请刷新重试'; lel.classList.remove('hidden');
+})();
 
-dropZone.addEventListener('click', () => fileInput.click());
-
-dropZone.addEventListener('dragover', (e) => {
-  e.preventDefault();
-  dropZone.classList.add('drag-over');
-});
-dropZone.addEventListener('dragleave', () => {
-  dropZone.classList.remove('drag-over');
-});
-dropZone.addEventListener('drop', (e) => {
-  e.preventDefault();
-  dropZone.classList.remove('drag-over');
-  const file = e.dataTransfer.files[0];
-  if (file && file.name.toLowerCase().endsWith('.stl')) {
-    const url = URL.createObjectURL(file);
-    loadSTL(url, file.name);
-  }
-});
-
-fileInput.addEventListener('change', () => {
-  const file = fileInput.files[0];
-  if (file) {
-    const url = URL.createObjectURL(file);
-    loadSTL(url, file.name);
-  }
-});
-
-// --- Keyboard shortcuts ---
 window.addEventListener('keydown', (e) => {
-  switch (e.key.toLowerCase()) {
-    case 'r': // Reset view
-      camera.position.set(40, 30, 50);
-      controls.target.set(0, 0, 0);
-      controls.update();
-      break;
-    case 'f': // Fit
-      if (currentModel) {
-        const box = new THREE.Box3().setFromObject(currentModel);
-        const size = box.getSize(new THREE.Vector3());
-        const center = box.getCenter(new THREE.Vector3());
-        const maxDim = Math.max(size.x, size.y, size.z);
-        camera.position.copy(center.clone().add(
-          new THREE.Vector3(maxDim * 1.2, maxDim * 0.8, maxDim * 1.4)
-        ));
-        controls.target.copy(center);
-        controls.update();
-      }
-      break;
-    case 'w': // Toggle wireframe
-      if (currentModel) {
-        const wf = currentModel.children[0];
-        if (wf) wf.visible = !wf.visible;
-      }
-      break;
-  }
+  if (e.key==='r') { camera.position.set(40,30,50); controls.target.set(0,0,0); controls.update(); }
+  if (e.key==='f' && models.length) fitCamera();
 });
-
-// --- Auto-hide hint ---
-setTimeout(() => { hint.style.opacity = '0'; }, 8000);
-
-// --- Try to load default STL ---
-async function tryLoadDefaults() {
-  for (const key of ['bottom', 'top']) {
-    const m = MODEL_URLS[key];
-    try {
-      console.log('Checking STL:', m.url);
-      const resp = await fetch(m.url, { method: 'HEAD' });
-      if (resp.ok) { console.log('STL found, loading:', m.url); switchModel(key); return; }
-      console.warn('STL not found (HTTP ' + resp.status + '):', m.url);
-    } catch (e) { console.error('STL check failed:', m.url, e); }
-  }
-  document.getElementById('loading').textContent = '拖放 .stl 文件以预览模型';
-  document.getElementById('loading').classList.remove('hidden');
-}
-tryLoadDefaults();
-
-// --- Render loop ---
-function animate() {
-  requestAnimationFrame(animate);
-  controls.update();
-  renderer.render(scene, camera);
-}
+setTimeout(() => { document.getElementById('hint').style.opacity='0'; }, 8000);
+function animate() { requestAnimationFrame(animate); controls.update(); renderer.render(scene, camera); }
 animate();
-
-// --- Resize ---
-window.addEventListener('resize', () => {
-  camera.aspect = container.clientWidth / container.clientHeight;
-  camera.updateProjectionMatrix();
-  renderer.setSize(container.clientWidth, container.clientHeight);
-});
+window.addEventListener('resize', () => { camera.aspect = container.clientWidth/container.clientHeight; camera.updateProjectionMatrix(); renderer.setSize(container.clientWidth, container.clientHeight); });
 </script>
 </body>
 </html>

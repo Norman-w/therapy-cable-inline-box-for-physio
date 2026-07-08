@@ -1,6 +1,6 @@
 // ============================================================
 // 上半壳体 — Z ≥ 0，分型面在 Z=0
-// Boss 柱从内顶面到分型面，与下半 Boss 柱同外径对接
+// 上包下：外壁向下延伸 OVERLAP_H 包裹下半壳体
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -9,26 +9,31 @@ include <cable-gland.scad>
 include <cable-strain-relief.scad>
 
 module top_half() {
-    half_h = BOX_HALF_INNER_H;             // = 9mm
+    half_h = BOX_HALF_INNER_H;
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
-
-    // 上半 Boss 柱：外径同下半 Φ5，内孔 Φ2.3（螺丝通孔）
-    top_boss_od = BOSS_DIAMETER;            // = 5mm
-    top_boss_id = SCREW_CLEARANCE;          // = 2.3mm
+    boss_h = half_h - BOSS_FACE_GAP;
+    top_boss_od = BOSS_DIAMETER;
+    top_boss_id = SCREW_CLEARANCE;
 
     difference() {
         union() {
-            // ===== 挖空的壳体 =====
+            // ===== 壳体 + 包围裙边 =====
             difference() {
-                intersection() {
-                    rounded_rect_prism(
-                        BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
-                        r_outer, center = true);
-                    translate([0, 0, +BOX_OUTER_HEIGHT])
-                        cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
-                             center = true);
+                union() {
+                    // 主壳体上半
+                    intersection() {
+                        rounded_rect_prism(
+                            BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
+                            r_outer, center = true);
+                        translate([0, 0, +BOX_OUTER_HEIGHT])
+                            cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
+                                 center = true);
+                    }
+                    // 包围裙边：从 Z=0 向下延伸 OVERLAP_H，壁厚 OVERLAP_T
+                    overlap_skirt_top();
                 }
+                // 内腔上半
                 intersection() {
                     rounded_rect_prism(
                         BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
@@ -39,45 +44,34 @@ module top_half() {
                 }
             }
 
-            // ===== 线缆锯齿压紧（上半，齿尖向下）=====
+            // ===== 线缆锯齿 =====
             cable_clamp_teeth_top();
 
-            // ===== 线缆夹持柱（最内齿旁，夹住线缆防晃动）=====
+            // ===== 线缆夹持柱 =====
             cable_guide_posts_top();
 
-            // ===== Boss 柱 ×4（内顶面根部锥形加固，到分型面与下半对接）=====
+            // ===== Boss 柱（缩减 0.5mm）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, 0])
                     difference() {
                         union() {
-                            // 直柱段（分型面到锥形根部）
-                            cylinder(d = top_boss_od,
-                                     h = half_h - BOSS_REINFORCE_H, $fn = 32);
-                            // 锥形根部（Φ5 过渡到 Φ8，在内顶面处加粗）
-                            translate([0, 0, half_h - BOSS_REINFORCE_H])
-                                cylinder(d1 = top_boss_od,
-                                         d2 = BOSS_REINFORCE_OD,
+                            cylinder(d = top_boss_od, h = boss_h - BOSS_REINFORCE_H, $fn = 32);
+                            translate([0, 0, boss_h - BOSS_REINFORCE_H])
+                                cylinder(d1 = top_boss_od, d2 = BOSS_REINFORCE_OD,
                                          h  = BOSS_REINFORCE_H, $fn = 32);
                         }
-                        // 内孔
                         translate([0, 0, -0.1])
-                            cylinder(d = top_boss_id,
-                                     h = half_h + 0.2, $fn = 32);
+                            cylinder(d = top_boss_id, h = boss_h + 0.2, $fn = 32);
                     }
             }
         }
 
-        // ===== 锥形沉头孔 ×4（锥尖嵌入 Boss 内孔 0.5mm，消除薄面）=====
+        // ===== 锥形沉头孔 =====
         for (sx = [-1, 1], sy = [-1, 1]) {
-            // 锥体从内顶面下方 0.5mm 开始，确保与 Boss 内孔重叠
-            translate([sx * BOSS_X, sy * BOSS_Y, half_h - 0.5])
-                cylinder(d1 = SCREW_CLEARANCE,
-                         d2 = SCREW_HEAD_DIAMETER,
-                         h  = WALL_THICKNESS + 0.6, $fn = 32);
+            translate([sx * BOSS_X, sy * BOSS_Y, boss_h])
+                cylinder(d1 = SCREW_CLEARANCE, d2 = SCREW_HEAD_DIAMETER,
+                         h  = WALL_THICKNESS + 0.1, $fn = 32);
         }
-
-        // ===== 定位凹槽 =====
-        alignment_groove();
 
         // ===== 电缆通道 =====
         for (mx = [-1, 1]) {
@@ -87,21 +81,27 @@ module top_half() {
     }
 }
 
-module alignment_groove() {
-    gh  = ALIGNMENT_LIP_H + 0.3;
-    gox = BOX_INNER_LENGTH / 2 + ALIGNMENT_LIP_W + PRINT_TOLERANCE;
-    goy = BOX_INNER_WIDTH  / 2 + ALIGNMENT_LIP_W + PRINT_TOLERANCE;
-    gix = BOX_INNER_LENGTH / 2 - PRINT_TOLERANCE;
-    giy = BOX_INNER_WIDTH  / 2 - PRINT_TOLERANCE;
-
+// 包围裙边：从 Z=0 向下 OVERLAP_H，壁厚 OVERLAP_T
+module overlap_skirt_top() {
+    ro = CORNER_RADIUS;
     difference() {
-        translate([0, 0, 0])
-        linear_extrude(height = gh)
-            rounded_rect_2d(gox * 2, goy * 2,
-                            max(CORNER_RADIUS - WALL_THICKNESS + ALIGNMENT_LIP_W, 0.5));
-        translate([0, 0, -0.1])
-        linear_extrude(height = gh + 0.2)
-            rounded_rect_2d(gix * 2, giy * 2,
-                            max(CORNER_RADIUS - WALL_THICKNESS, 0.5));
+        intersection() {
+            rounded_rect_prism(
+                BOX_OUTER_LENGTH + 0.2, BOX_OUTER_WIDTH + 0.2, OVERLAP_H * 2,
+                ro, center = true);
+            translate([0, 0, -OVERLAP_H/2])
+                cube([BOX_OUTER_LENGTH + 2, BOX_OUTER_WIDTH + 2, OVERLAP_H + 0.1], center = true);
+        }
+        intersection() {
+            rounded_rect_prism(
+                BOX_OUTER_LENGTH - OVERLAP_T*2, BOX_OUTER_WIDTH - OVERLAP_T*2, OVERLAP_H * 2,
+                max(ro - OVERLAP_T, 0.5), center = true);
+            translate([0, 0, -OVERLAP_H/2 - 0.1])
+                cube([BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, OVERLAP_H + 0.4], center = true);
+        }
+        for (mx = [-1, 1]) {
+            translate([mx * BOX_OUTER_LENGTH / 2, 0, -OVERLAP_H/2])
+                cube([BOX_OUTER_LENGTH/4, CABLE_DIAMETER + 2, OVERLAP_H + 0.2], center = true);
+        }
     }
 }

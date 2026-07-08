@@ -1,6 +1,6 @@
 // ============================================================
 // 下半壳体 — Z ≤ 0，分型面在 Z=0
-// 重构：先切电阻腔 → 再加 Boss柱+挡柱 → 最后切线缆孔
+// 上包下：顶部外壁减薄 OVERLAP_T，让上半外壁包裹
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -13,10 +13,9 @@ module bottom_half() {
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
 
-    difference() {  // === 最终切除 ===
+    difference() {
         union() {
-
-            // ===== 阶段 1: 挖空壳体 =====
+            // ===== 壳体：下半截正常壁厚，顶部减薄让上半包裹 =====
             difference() {
                 // 外壳下半
                 intersection() {
@@ -36,33 +35,32 @@ module bottom_half() {
                         cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
                              center = true);
                 }
+                // 顶部外壁减薄 OVERLAP_T（供上半外壁包裹）
+                overlap_recess_bottom();
             }
 
-            // ===== 阶段 2: 添加到已切割完成的壳体上 =====
-            // Boss 柱
+            // ===== Boss 柱（缩减 0.5mm 防挤压）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
+                boss_h = half_h - BOSS_FACE_GAP;
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
                     cylinder(d1 = BOSS_REINFORCE_OD, d2 = BOSS_DIAMETER,
                              h  = BOSS_REINFORCE_H, $fn = 32);
                     translate([0, 0, BOSS_REINFORCE_H])
-                        cylinder(d = BOSS_DIAMETER, h = half_h - BOSS_REINFORCE_H, $fn = 32);
+                        cylinder(d = BOSS_DIAMETER, h = boss_h - BOSS_REINFORCE_H, $fn = 32);
                 }
             }
 
-            // 线缆锯齿压紧（下半，齿尖向上）
+            // 线缆锯齿
             cable_clamp_teeth_bottom();
-
-            // 定位凸缘
-            alignment_lip();
         }
 
-        // ===== 最终切除：Boss 导孔 =====
+        // ===== Boss 导孔 =====
         for (sx = [-1, 1], sy = [-1, 1]) {
             translate([sx * BOSS_X, sy * BOSS_Y, -half_h - 0.1])
                 cylinder(d = BOSS_PILOT_HOLE, h = half_h + 0.4, $fn = 24);
         }
 
-        // ===== 最终切除：电缆通道（会切过挡柱，形成线缆导槽）=====
+        // ===== 电缆通道 =====
         for (mx = [-1, 1]) {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])
                 cable_channel_half_bottom();
@@ -70,22 +68,23 @@ module bottom_half() {
     }
 }
 
-module alignment_lip() {
-    lh  = ALIGNMENT_LIP_H;
-    lw  = ALIGNMENT_LIP_W;
-    lox = BOX_INNER_LENGTH / 2 + lw;
-    loy = BOX_INNER_WIDTH  / 2 + lw;
-    lix = BOX_INNER_LENGTH / 2 - PRINT_TOLERANCE;
-    liy = BOX_INNER_WIDTH  / 2 - PRINT_TOLERANCE;
-
-    difference() {
-        translate([0, 0, 0])
-        linear_extrude(height = lh)
-            rounded_rect_2d(lox * 2, loy * 2,
-                            max(CORNER_RADIUS - WALL_THICKNESS + lw, 0.5));
-        translate([0, 0, -0.1])
-        linear_extrude(height = lh + 0.2)
-            rounded_rect_2d(lix * 2, liy * 2,
-                            max(CORNER_RADIUS - WALL_THICKNESS, 0.5));
+// 顶部外壁减薄：Z=-OVERLAP_H 到 Z=0，外壁削去 OVERLAP_T
+module overlap_recess_bottom() {
+    ro = CORNER_RADIUS;
+    // 外圈：外壳顶部
+    intersection() {
+        rounded_rect_prism(
+            BOX_OUTER_LENGTH + 1, BOX_OUTER_WIDTH + 1, OVERLAP_H * 2,
+            ro, center = true);
+        translate([0, 0, -OVERLAP_H/2])
+            cube([BOX_OUTER_LENGTH + 2, BOX_OUTER_WIDTH + 2, OVERLAP_H + 0.1], center = true);
+    }
+    // 减内圈
+    intersection() {
+        rounded_rect_prism(
+            BOX_OUTER_LENGTH - OVERLAP_T*2, BOX_OUTER_WIDTH - OVERLAP_T*2, OVERLAP_H * 2,
+            max(ro - OVERLAP_T, 0.5), center = true);
+        translate([0, 0, -OVERLAP_H/2 - 0.1])
+            cube([BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, OVERLAP_H + 0.4], center = true);
     }
 }
