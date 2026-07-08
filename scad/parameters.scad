@@ -50,7 +50,7 @@ GLAND_WALL_EXTRA    = 1.5;      // 壁厚之外的额外延伸（向内多 0.5mm
 
 // ---- 定位结构 ----
 ALIGNMENT_LIP_H     = 0.8;      // 分型面定位凸缘高度
-ALIGNMENT_LIP_W     = 1.2;      // 凸缘宽度
+ALIGNMENT_LIP_W     = 0.8;      // 凸缘宽度（壳体厚度的一半）
 
 // ---- 打印公差 ----
 PRINT_TOLERANCE     = 0.2;      // 配合面公差

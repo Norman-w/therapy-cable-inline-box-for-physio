@@ -13,9 +13,10 @@ module top_half() {
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
 
-    // 上半 Boss 柱：外径同下半 Φ5，内孔 Φ2.3（螺丝通孔）
-    top_boss_od = BOSS_DIAMETER;            // = 5mm
-    top_boss_id = SCREW_CLEARANCE;          // = 2.3mm
+    // 上半 Boss 柱
+    top_boss_od = BOSS_DIAMETER;
+    top_boss_id = SCREW_CLEARANCE;
+    boss_h = half_h - 0.5;
 
     difference() {
         union() {
@@ -42,35 +43,31 @@ module top_half() {
             // ===== 线缆锯齿压紧（上半，齿尖向下）=====
             cable_clamp_teeth_top();
 
-            // ===== 线缆夹持柱（最内齿旁，夹住线缆防晃动）=====
+            // ===== 线缆夹持柱 =====
             cable_guide_posts_top();
 
-            // ===== Boss 柱 ×4（内顶面根部锥形加固，到分型面与下半对接）=====
+            // ===== Boss 柱 ×4（缩短0.5mm留缝隙）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, 0])
                     difference() {
                         union() {
-                            // 直柱段（分型面到锥形根部）
                             cylinder(d = top_boss_od,
-                                     h = half_h - BOSS_REINFORCE_H, $fn = 32);
-                            // 锥形根部（Φ5 过渡到 Φ8，在内顶面处加粗）
-                            translate([0, 0, half_h - BOSS_REINFORCE_H])
+                                     h = boss_h - BOSS_REINFORCE_H, $fn = 32);
+                            translate([0, 0, boss_h - BOSS_REINFORCE_H])
                                 cylinder(d1 = top_boss_od,
                                          d2 = BOSS_REINFORCE_OD,
                                          h  = BOSS_REINFORCE_H, $fn = 32);
                         }
-                        // 内孔
                         translate([0, 0, -0.1])
                             cylinder(d = top_boss_id,
-                                     h = half_h + 0.2, $fn = 32);
+                                     h = boss_h + 0.2, $fn = 32);
                     }
             }
         }
 
-        // ===== 锥形沉头孔 ×4（锥尖嵌入 Boss 内孔 0.5mm，消除薄面）=====
+        // ===== 锥形沉头孔 =====
         for (sx = [-1, 1], sy = [-1, 1]) {
-            // 锥体从内顶面下方 0.5mm 开始，确保与 Boss 内孔重叠
-            translate([sx * BOSS_X, sy * BOSS_Y, half_h - 0.5])
+            translate([sx * BOSS_X, sy * BOSS_Y, boss_h - 0.3])
                 cylinder(d1 = SCREW_CLEARANCE,
                          d2 = SCREW_HEAD_DIAMETER,
                          h  = WALL_THICKNESS + 0.6, $fn = 32);
