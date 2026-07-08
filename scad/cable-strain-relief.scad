@@ -54,26 +54,34 @@ module cable_clamp_teeth_top() {
 // ============================================================
 GUIDE_POST_X_OFFSET = 12.0;  // 柱远心端与最内齿立面(X=14)平齐
 GUIDE_POST_Y_GAP     = 2.5;   // 柱 Y 半间距（间隙 5mm）
-GUIDE_POST_SIZE      = 2.0;   // 柱截面边长（窄柱减少冲突）
+GUIDE_POST_SIZE      = 2.0;   // 柱截面边长
 GUIDE_POST_BELOW     = 5.0;   // 柱伸出分型面以下长度
+GUIDE_POST_BASE_EXTRA = 1.5;  // 根部加固每侧加宽
+GUIDE_POST_BASE_H    = 3.0;   // 根部加固段高度
 
 module cable_guide_posts_top() {
     half_h = BOX_HALF_INNER_H;
-    post_h = half_h + GUIDE_POST_BELOW;  // 9 + 5 = 14mm
-    s = GUIDE_POST_SIZE;
+    post_h = half_h + GUIDE_POST_BELOW;   // 14mm
+    s  = GUIDE_POST_SIZE;
+    bs = s + GUIDE_POST_BASE_EXTRA * 2;   // 底座宽 5mm
+    upper_h = post_h - GUIDE_POST_BASE_H; // 上部 11mm
+    offset = GUIDE_POST_BASE_EXTRA;        // 上部偏移 1.5mm
 
-    // 最内齿立面 X 坐标
     tooth_face_x = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - (TOOTH_COUNT-1)*TOOTH_SPACING;
 
     for (mx = [-1, 1]) {
-        // 柱远心端与最内齿立面平齐
-        x_corner = mx > 0 ? tooth_face_x - s
-                          : -tooth_face_x;
+        x_corner = mx > 0 ? tooth_face_x - s - offset
+                          : -tooth_face_x - offset;
         for (sy = [-1, 1]) {
-            y_pos = sy > 0 ? GUIDE_POST_Y_GAP
-                           : -GUIDE_POST_Y_GAP - s;
-            translate([x_corner, y_pos, -GUIDE_POST_BELOW])
-                cube([s, s, post_h]);
+            y_base = sy > 0 ? GUIDE_POST_Y_GAP - offset
+                            : -GUIDE_POST_Y_GAP - s - offset;
+            translate([x_corner, y_base, -GUIDE_POST_BELOW]) {
+                // 加宽底座（靠壳体顶壁）
+                cube([bs, bs, GUIDE_POST_BASE_H]);
+                // 上部细柱
+                translate([offset, offset, GUIDE_POST_BASE_H])
+                    cube([s, s, upper_h]);
+            }
         }
     }
 }
