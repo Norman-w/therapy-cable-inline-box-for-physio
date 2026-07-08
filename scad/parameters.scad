@@ -46,7 +46,7 @@ SCREW_BOSS_HEIGHT   = 0.6;      // 凸台高度
 // ---- 电缆出线孔 ----
 // 孔只穿过壁厚 + 少量延伸，不深入内腔，避免打到内部结构
 GLAND_HOLE_DIAM     = 5.4;      // 出线孔径（CABLE 5mm + 0.4 间隙）
-GLAND_WALL_EXTRA    = 1.0;      // 壁厚之外的额外延伸（内外各加一点）
+GLAND_WALL_EXTRA    = 1.5;      // 壁厚之外的额外延伸（向内多 0.5mm）
 
 // ---- 定位结构 ----
 ALIGNMENT_LIP_H     = 0.8;      // 分型面定位凸缘高度
