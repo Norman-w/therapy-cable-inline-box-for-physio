@@ -4,15 +4,17 @@
 // ============================================================
 include <parameters.scad>
 
-// 挡柱参数
-STRAIN_POST_DIAM       = 3.5;   // 柱径
+// 矩形挡柱参数
+STRAIN_POST_W          = 2.5;   // 柱宽 (X向)
+STRAIN_POST_D          = 5.0;   // 柱厚 (Y向)
 STRAIN_POST_Y_OFFSET   = 3.0;   // 两柱 Y 向错开距离（±）
 STRAIN_POST_X_SPACING  = 8.0;   // 两柱 X 向间距
 STRAIN_POST_ENTRY_GAP  = 5.0;   // 第一柱距内端面距离
+STRAIN_POST_ABOVE      = 5.0;   // 凸出分型面以上高度
 
 module cable_strain_relief_posts() {
     half_h = BOX_HALF_INNER_H;
-    post_h = half_h + 3.0;  // 从底板伸到分型面以上 3mm
+    post_h = half_h + STRAIN_POST_ABOVE;  // 从底板伸到分型面以上 5mm
 
     for (mx = [-1, 1]) {
         // 柱 A（靠近线缆入口，偏 +Y）
@@ -23,8 +25,8 @@ module cable_strain_relief_posts() {
         by = -STRAIN_POST_Y_OFFSET;
 
         for (pos = [[ax, ay], [bx, by]]) {
-            translate([pos[0], pos[1], -half_h])
-                cylinder(d = STRAIN_POST_DIAM, h = post_h, $fn = 24);
+            translate([pos[0] - STRAIN_POST_W/2, pos[1] - STRAIN_POST_D/2, -half_h])
+                cube([STRAIN_POST_W, STRAIN_POST_D, post_h]);
         }
     }
 }
