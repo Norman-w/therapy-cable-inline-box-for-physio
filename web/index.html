@@ -334,9 +334,11 @@ const STL_BASE = (() => {
   const base = p.replace(/\/(web\/)?(index\.html)?$/, '').replace(/\/+$/, '');
   return base;
 })();
+// 加时间戳破浏览器缓存
+const STL_TS = '?v=' + Date.now();
 const MODEL_URLS = {
-  bottom: { url: STL_BASE + '/stl/bottom-half.stl', name: '下半壳体' },
-  top:    { url: STL_BASE + '/stl/top-half.stl',    name: '上半壳体' },
+  bottom: { url: STL_BASE + '/stl/bottom-half.stl' + STL_TS, name: '下半壳体' },
+  top:    { url: STL_BASE + '/stl/top-half.stl'    + STL_TS, name: '上半壳体' },
 };
 
 // 设置下载链接
