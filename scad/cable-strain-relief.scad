@@ -7,7 +7,7 @@ STRAIN_POST_W          = 3.0;   // 柱宽 (X向)
 STRAIN_POST_D          = 4.0;   // 柱厚 (Y向)
 STRAIN_POST_ENTRY_GAP  = 1.0;   // 柱 A 距内端面
 STRAIN_POST_SPACING    = 9.0;   // 柱 A 到柱 B 的 X 间距
-STRAIN_POST_ABOVE      = 5.0;   // 凸出分型面以上
+STRAIN_POST_ABOVE      = 0.0;   // 与分型面齐平
 
 module cable_strain_relief_posts() {
     half_h = BOX_HALF_INNER_H;
