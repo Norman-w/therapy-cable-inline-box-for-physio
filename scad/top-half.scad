@@ -17,7 +17,7 @@ module top_half() {
     top_boss_od = BOSS_DIAMETER;
     top_boss_id = SCREW_CLEARANCE;
     // 缩短在分型面端（Z=0.5起），靠壳壁端齐平（到Z=9）
-    boss_base = 0.5;
+    boss_base = 0.25;
     boss_h = half_h;
 
     difference() {
