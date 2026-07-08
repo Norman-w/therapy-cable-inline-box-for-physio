@@ -1,6 +1,5 @@
 // ============================================================
 // 下半壳体 — Z ≤ 0，分型面在 Z=0
-// 上包下：顶部外壁减薄 OVERLAP_T，让上半外壁包裹
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -15,9 +14,8 @@ module bottom_half() {
 
     difference() {
         union() {
-            // ===== 壳体：下半截正常壁厚，顶部减薄让上半包裹 =====
+            // ===== 壳体 =====
             difference() {
-                // 外壳下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
@@ -26,7 +24,6 @@ module bottom_half() {
                         cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
                              center = true);
                 }
-                // 内腔下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
@@ -35,11 +32,9 @@ module bottom_half() {
                         cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
                              center = true);
                 }
-                // 顶部外壁减薄 OVERLAP_T（供上半外壁包裹）
-                overlap_recess_bottom();
             }
 
-            // ===== Boss 柱（缩减 0.5mm 防挤压）=====
+            // ===== Boss 柱（端面缩减 BOSS_FACE_GAP 防挤压）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 boss_h = half_h - BOSS_FACE_GAP;
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
@@ -65,26 +60,5 @@ module bottom_half() {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])
                 cable_channel_half_bottom();
         }
-    }
-}
-
-// 顶部外壁减薄：Z=-OVERLAP_H 到 Z=0，外壁削去 OVERLAP_T
-module overlap_recess_bottom() {
-    ro = CORNER_RADIUS;
-    // 外圈：外壳顶部
-    intersection() {
-        rounded_rect_prism(
-            BOX_OUTER_LENGTH + 1, BOX_OUTER_WIDTH + 1, OVERLAP_H * 2,
-            ro, center = true);
-        translate([0, 0, -OVERLAP_H/2])
-            cube([BOX_OUTER_LENGTH + 2, BOX_OUTER_WIDTH + 2, OVERLAP_H + 0.1], center = true);
-    }
-    // 减内圈
-    intersection() {
-        rounded_rect_prism(
-            BOX_OUTER_LENGTH - OVERLAP_T*2, BOX_OUTER_WIDTH - OVERLAP_T*2, OVERLAP_H * 2,
-            max(ro - OVERLAP_T, 0.5), center = true);
-        translate([0, 0, -OVERLAP_H/2 - 0.1])
-            cube([BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, OVERLAP_H + 0.4], center = true);
     }
 }
