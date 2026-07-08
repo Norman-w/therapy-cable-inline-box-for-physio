@@ -48,6 +48,31 @@ module cable_clamp_teeth_top() {
     }
 }
 
+// ============================================================
+// 线缆夹持柱 — 上半壳最内齿旁，2柱夹住线缆防晃动
+// 柱高从内顶面到分型面下 5mm，间隙 5mm 夹住线缆
+// ============================================================
+GUIDE_POST_X_OFFSET = 11.0;  // 柱 X 坐标（距中心）
+GUIDE_POST_Y_GAP     = 2.5;   // 柱 Y 半间距（间隙 5mm）
+GUIDE_POST_SIZE      = 3.0;   // 柱截面边长
+GUIDE_POST_BELOW     = 5.0;   // 柱伸出分型面以下长度
+
+module cable_guide_posts_top() {
+    half_h = BOX_HALF_INNER_H;
+    post_h = half_h + GUIDE_POST_BELOW;  // 9 + 5 = 14mm
+    s = GUIDE_POST_SIZE;
+
+    for (mx = [-1, 1]) {
+        for (sy = [-1, 1]) {
+            // 柱内边距 Y=0 正好 2.5mm → 间隙 5mm 夹住线缆
+            y_pos = sy > 0 ? GUIDE_POST_Y_GAP
+                           : -GUIDE_POST_Y_GAP - s;
+            translate([mx * GUIDE_POST_X_OFFSET, y_pos, -GUIDE_POST_BELOW])
+                cube([s, s, post_h]);
+        }
+    }
+}
+
 // hull 两块矩形板 = 梯形棱柱，自动水密
 // invert=false: 底宽顶窄（下半齿：宽在壳壁，窄在齿尖）
 // invert=true:  底窄顶宽（上半齿：窄在齿尖，宽在壳壁）

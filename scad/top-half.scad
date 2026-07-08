@@ -42,6 +42,9 @@ module top_half() {
             // ===== 线缆锯齿压紧（上半，齿尖向下）=====
             cable_clamp_teeth_top();
 
+            // ===== 线缆夹持柱（最内齿旁，夹住线缆防晃动）=====
+            cable_guide_posts_top();
+
             // ===== Boss 柱 ×4（内顶面根部锥形加固，到分型面与下半对接）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, 0])
