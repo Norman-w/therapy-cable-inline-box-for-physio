@@ -45,6 +45,9 @@ module bottom_half() {
                 }
             }
 
+            // ===== 内衬密封圈（1mm厚，向下2mm+向上2mm凸出）=====
+            inner_liner();
+
             // 线缆锯齿
             cable_clamp_teeth_bottom();
         }
@@ -60,5 +63,23 @@ module bottom_half() {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])
                 cable_channel_half_bottom();
         }
+    }
+}
+
+// 内衬密封圈：1mm壁厚，向下2mm+向上2mm凸出，桥接上下半壳
+module inner_liner() {
+    lh = LINER_EXTEND * 2;  // 4mm 总高
+    lox = BOX_INNER_LENGTH/2 - LINER_TOLERANCE;
+    loy = BOX_INNER_WIDTH/2  - LINER_TOLERANCE;
+    lix = lox - LINER_THICKNESS;
+    liy = loy - LINER_THICKNESS;
+    lr  = max(CORNER_RADIUS - WALL_THICKNESS - LINER_TOLERANCE, 0.5);
+    lri = max(lr - LINER_THICKNESS, 0.3);
+
+    translate([-lox, -loy, -LINER_EXTEND])
+    difference() {
+        rounded_rect_prism(lox*2, loy*2, lh, lr, center=false);
+        translate([LINER_THICKNESS, LINER_THICKNESS, -0.1])
+            rounded_rect_prism(lix*2, liy*2, lh + 0.2, lri, center=false);
     }
 }

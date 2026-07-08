@@ -56,6 +56,11 @@ OVERLAP_T           = 0.8;      // 包围壁厚（= 壳体壁厚的一半）
 ALIGNMENT_LIP_H     = 0.8;      // 分型面定位凸缘高度
 ALIGNMENT_LIP_W     = 1.2;      // 凸缘宽度
 
+// ---- 内衬密封圈 ----
+LINER_THICKNESS     = 1.0;      // 内衬壁厚
+LINER_EXTEND        = 2.0;      // 向每半壳体延伸长度
+LINER_TOLERANCE     = 0.2;      // 与内腔配合间隙
+
 // ---- Boss 柱配合间隙 ----
 BOSS_FACE_GAP       = 0.5;      // 上下 Boss 柱端面间隙（防挤压凸起）
 
