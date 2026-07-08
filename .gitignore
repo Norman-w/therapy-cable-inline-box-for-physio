@@ -1,0 +1,7 @@
+.claude/
+stl/*.stl
+web/node_modules/
+*.swp
+*.swo
+*~
+.DS_Store
