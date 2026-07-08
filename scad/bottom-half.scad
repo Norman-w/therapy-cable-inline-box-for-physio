@@ -6,6 +6,7 @@ include <parameters.scad>
 include <utilities.scad>
 include <resistor-holder.scad>
 include <cable-gland.scad>
+include <cable-strain-relief.scad>
 
 module bottom_half() {
     half_h = BOX_HALF_INNER_H;
@@ -47,6 +48,9 @@ module bottom_half() {
                                  h = half_h - BOSS_REINFORCE_H, $fn = 32);
                 }
             }
+
+            // ===== 线缆 S 型绕柱加固 =====
+            cable_strain_relief_posts();
 
             // ===== 定位凸缘 =====
             alignment_lip();

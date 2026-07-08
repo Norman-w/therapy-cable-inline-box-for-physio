@@ -11,6 +11,7 @@ include <parameters.scad>
 include <utilities.scad>
 include <resistor-holder.scad>
 include <cable-gland.scad>
+include <cable-strain-relief.scad>
 include <bottom-half.scad>
 include <top-half.scad>
 
