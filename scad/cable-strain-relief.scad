@@ -14,15 +14,17 @@ TOOTH_FIRST_X   = 2.0;   // 第一齿距内端面
 
 module cable_clamp_teeth_bottom() {
     half_h = BOX_HALF_INNER_H;
-    tooth_h = half_h - TOOTH_GAP/2;   // 7mm
+    tooth_h = half_h - TOOTH_GAP/2;
     bw = TOOTH_BASE_X;
     tw = TOOTH_TOP_X;
     w  = TOOTH_WIDTH_Y;
+    // 下半每侧 2 齿，向中心偏移半个齿距 → 3包2 交错咬合
+    count = TOOTH_COUNT - 1;
+    offset = TOOTH_SPACING / 2;
 
     for (mx = [-1, 1]) {
-        for (i = [0 : TOOTH_COUNT - 1]) {
-            tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - i * TOOTH_SPACING;
-            // 齿底在 Z=-9, 尖在 Z=-2
+        for (i = [0 : count - 1]) {
+            tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - offset - i * TOOTH_SPACING;
             translate([mx * tx, 0, -half_h])
                 _tooth(bw, tw, tooth_h, w, mx < 0, invert = false);
         }
