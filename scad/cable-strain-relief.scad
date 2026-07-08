@@ -70,17 +70,24 @@ module cable_guide_posts_top() {
     tooth_face_x = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - (TOOTH_COUNT-1)*TOOTH_SPACING;
 
     for (mx = [-1, 1]) {
-        x_corner = mx > 0 ? tooth_face_x - s - offset
-                          : -tooth_face_x - offset;
+        // 柱远端（远心端）与齿立面平齐
+        x_narrow = mx > 0 ? tooth_face_x - s      // 窄柱角: 12→14
+                          : -tooth_face_x;          // 窄柱角: -14→-12
+        x_wide   = mx > 0 ? tooth_face_x - bs     // 宽柱角: 9→14
+                          : -tooth_face_x;          // 宽柱角: -14→-9
+
         for (sy = [-1, 1]) {
-            y_base = sy > 0 ? GUIDE_POST_Y_GAP - offset
-                            : -GUIDE_POST_Y_GAP - s - offset;
-            translate([x_corner, y_base, -GUIDE_POST_BELOW]) {
+            y_narrow = sy > 0 ? GUIDE_POST_Y_GAP           // +Y窄柱
+                              : -GUIDE_POST_Y_GAP - s;     // -Y窄柱
+            y_wide   = sy > 0 ? GUIDE_POST_Y_GAP - offset  // +Y宽柱
+                              : -GUIDE_POST_Y_GAP - s - offset;  // -Y宽柱
+
+            translate([x_narrow, y_narrow, -GUIDE_POST_BELOW]) {
+                // 下部细柱（靠分型面）
+                cube([s, s, upper_h]);
                 // 加宽底座（靠壳体顶壁）
-                cube([bs, bs, GUIDE_POST_BASE_H]);
-                // 上部细柱
-                translate([offset, offset, GUIDE_POST_BASE_H])
-                    cube([s, s, upper_h]);
+                translate([x_wide - x_narrow, y_wide - y_narrow, upper_h])
+                    cube([bs, bs, GUIDE_POST_BASE_H]);
             }
         }
     }
