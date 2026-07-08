@@ -5,7 +5,7 @@ include <parameters.scad>
 
 STRAIN_POST_W          = 3.0;   // 柱宽 (X向)
 STRAIN_POST_D          = 4.0;   // 柱厚 (Y向)
-STRAIN_POST_ENTRY_GAP  = 1.0;   // 柱 A 距内端面
+STRAIN_POST_ENTRY_GAP  = 6.0;   // 柱 A 距内端面（向中心挪5mm）
 STRAIN_POST_SPACING    = 9.0;   // 柱 A 到柱 B 的 X 间距
 STRAIN_POST_ABOVE      = 0.0;   // 与分型面齐平
 
