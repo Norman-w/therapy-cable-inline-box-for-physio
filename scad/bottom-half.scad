@@ -41,7 +41,7 @@ module bottom_half() {
             // ===== 阶段 2: 添加到已切割完成的壳体上 =====
             // Boss 柱
             for (sx = [-1, 1], sy = [-1, 1]) {
-                boss_top = half_h - 0.25;  // 分型面端缩0.5mm
+                boss_top = half_h;  // 不分型面端，到齐
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
                     cylinder(d1 = BOSS_REINFORCE_OD, d2 = BOSS_DIAMETER,
                              h  = BOSS_REINFORCE_H, $fn = 32);
