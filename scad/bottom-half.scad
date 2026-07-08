@@ -66,20 +66,34 @@ module bottom_half() {
     }
 }
 
-// 内衬密封圈：1mm壁厚，向下2mm+向上2mm凸出，桥接上下半壳
+// 内衬密封圈：嵌入壳壁1mm，内面与原腔内壁齐平，Boss和过线处留空
 module inner_liner() {
     lh = LINER_EXTEND * 2;  // 4mm 总高
-    lox = BOX_INNER_LENGTH/2 - LINER_TOLERANCE;
-    loy = BOX_INNER_WIDTH/2  - LINER_TOLERANCE;
-    lix = lox - LINER_THICKNESS;
-    liy = loy - LINER_THICKNESS;
-    lr  = max(CORNER_RADIUS - WALL_THICKNESS - LINER_TOLERANCE, 0.5);
-    lri = max(lr - LINER_THICKNESS, 0.3);
+    lox = BOX_INNER_LENGTH/2;
+    loy = BOX_INNER_WIDTH/2;
+    lr  = max(CORNER_RADIUS - WALL_THICKNESS, 0.5);
 
-    translate([-lox, -loy, -LINER_EXTEND])
+    // 外圈 = 比内腔大1mm（嵌入壳壁），内圈 = 内腔（齐平）
+    translate([-lox - LINER_THICKNESS, -loy - LINER_THICKNESS, -LINER_EXTEND])
     difference() {
-        rounded_rect_prism(lox*2, loy*2, lh, lr, center=false);
+        // 外边界：比内腔大1mm
+        rounded_rect_prism(
+            (lox + LINER_THICKNESS)*2, (loy + LINER_THICKNESS)*2, lh,
+            lr + LINER_THICKNESS, center=false);
+        // 内边界：原腔内壁（保留，齐平）
         translate([LINER_THICKNESS, LINER_THICKNESS, -0.1])
-            rounded_rect_prism(lix*2, liy*2, lh + 0.2, lri, center=false);
+            rounded_rect_prism(lox*2, loy*2, lh + 0.2, lr, center=false);
+        // 挖空 Boss 位
+        for (sx = [-1, 1], sy = [-1, 1]) {
+            translate([lox + LINER_THICKNESS + sx*BOSS_X,
+                       loy + LINER_THICKNESS + sy*BOSS_Y, -1])
+                cylinder(d = BOSS_DIAMETER + 4, h = lh + 2, $fn = 32);
+        }
+        // 挖空过线处
+        for (mx = [-1, 1]) {
+            translate([lox + LINER_THICKNESS + mx*BOX_INNER_LENGTH/2,
+                       loy + LINER_THICKNESS, -1])
+                cube([WALL_THICKNESS*3, CABLE_DIAMETER + 4, lh + 2], center = true);
+        }
     }
 }
