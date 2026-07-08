@@ -49,8 +49,8 @@ module bottom_half() {
                 }
             }
 
-            // 线缆挡柱（S 型绕线）
-            cable_strain_relief_posts();
+            // 线缆锯齿压紧（下半，齿尖向上）
+            cable_clamp_teeth_bottom();
 
             // 定位凸缘
             alignment_lip();

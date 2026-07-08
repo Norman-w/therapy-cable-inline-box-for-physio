@@ -6,6 +6,7 @@ include <parameters.scad>
 include <utilities.scad>
 include <resistor-holder.scad>
 include <cable-gland.scad>
+include <cable-strain-relief.scad>
 
 module top_half() {
     half_h = BOX_HALF_INNER_H;             // = 9mm
@@ -37,6 +38,9 @@ module top_half() {
                              center = true);
                 }
             }
+
+            // ===== 线缆锯齿压紧（上半，齿尖向下）=====
+            cable_clamp_teeth_top();
 
             // ===== Boss 柱 ×4（内顶面根部锥形加固，到分型面与下半对接）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
