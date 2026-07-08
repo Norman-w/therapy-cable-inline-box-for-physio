@@ -1,32 +1,36 @@
 // ============================================================
-// 线缆 S 型绕柱加固 — 两组大截面矩形挡柱强制线缆走 S 弯
-// 装在下半壳体，从底板伸到分型面以上 5mm
+// 线缆 S 型绕柱加固 — 4 根矩形挡柱在中轴线上，根部加宽加固
 // ============================================================
 include <parameters.scad>
 
-// 大截面矩形挡柱，清晰可见
-STRAIN_POST_W          = 4.0;   // 柱宽 (X向)
-STRAIN_POST_D          = 8.0;   // 柱厚 (Y向) — 大截面确保挡住线缆
-STRAIN_POST_Y_OFFSET   = 4.0;   // Y 向偏移（柱中心距 Y=0 的距离）
-STRAIN_POST_X_SPACING  = 10.0;  // 两柱 X 向间距
-STRAIN_POST_ENTRY_GAP  = 1.0;   // 第一柱距内端面
+STRAIN_POST_W          = 3.0;   // 柱宽 (X向)
+STRAIN_POST_D          = 4.0;   // 柱厚 (Y向)
+STRAIN_POST_ENTRY_GAP  = 1.0;   // 柱 A 距内端面
+STRAIN_POST_SPACING    = 9.0;   // 柱 A 到柱 B 的 X 间距
 STRAIN_POST_ABOVE      = 5.0;   // 凸出分型面以上
+STRAIN_BASE_EXTRA      = 1.5;   // 根部每侧加宽量
+STRAIN_BASE_H          = 3.0;   // 根部加宽段高度
 
 module cable_strain_relief_posts() {
     half_h = BOX_HALF_INNER_H;
-    post_h = half_h + STRAIN_POST_ABOVE;
+    post_h = half_h + STRAIN_POST_ABOVE;          // 14mm 总高
+    upper_h = post_h - STRAIN_BASE_H;             // 上部直柱 11mm
+    bw = STRAIN_POST_W + STRAIN_BASE_EXTRA * 2;   // 底座宽 6mm
+    bd = STRAIN_POST_D + STRAIN_BASE_EXTRA * 2;   // 底座厚 7mm
+    bx = STRAIN_BASE_EXTRA;  // 上部相对底座的偏移
 
     for (mx = [-1, 1]) {
-        // 柱 A：靠近线缆入口，偏 +Y，挡住直行路线
         ax = mx * (BOX_INNER_LENGTH / 2 - STRAIN_POST_ENTRY_GAP);
-        ay = STRAIN_POST_Y_OFFSET;
-        // 柱 B：靠内，偏 -Y，形成 S 弯第二拐点
-        bx = mx * (BOX_INNER_LENGTH / 2 - STRAIN_POST_ENTRY_GAP - STRAIN_POST_X_SPACING);
-        by = -STRAIN_POST_Y_OFFSET;
+        bx = mx * (BOX_INNER_LENGTH / 2 - STRAIN_POST_ENTRY_GAP - STRAIN_POST_SPACING);
 
-        for (pos = [[ax, ay], [bx, by]]) {
-            translate([pos[0] - STRAIN_POST_W/2, pos[1] - STRAIN_POST_D/2, -half_h])
-                cube([STRAIN_POST_W, STRAIN_POST_D, post_h]);
+        for (cx = [ax, bx]) {
+            translate([cx - bw/2, -bd/2, -half_h]) {
+                // 加宽底座
+                cube([bw, bd, STRAIN_BASE_H]);
+                // 上部窄柱
+                translate([bx, bx, STRAIN_BASE_H])
+                    cube([STRAIN_POST_W, STRAIN_POST_D, upper_h]);
+            }
         }
     }
 }

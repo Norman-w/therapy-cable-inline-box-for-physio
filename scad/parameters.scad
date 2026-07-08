@@ -43,11 +43,10 @@ SCREW_HEAD_DEPTH    = 1.8;      // 沉头孔深度
 SCREW_BOSS_OD       = 6.5;      // 上半螺丝位凸台外径（壳体外的定位圆柱）
 SCREW_BOSS_HEIGHT   = 0.6;      // 凸台高度
 
-// ---- 电缆密封/应力释放 ----
-GLAND_LENGTH        = 12.0;     // 出线口长度（含壁厚）
-GLAND_CLAMP_DIAM    = 4.6;      // 压紧通道直径（< CABLE_DIAMETER 实现夹紧）
-GLAND_RIB_COUNT     = 3;        // 内部抓线肋条数
-GLAND_OUTER_EXTEND  = 4.0;      // 外部延伸长度（应力释放管）
+// ---- 电缆出线孔 ----
+// 孔只穿过壁厚 + 少量延伸，不深入内腔，避免打到内部结构
+GLAND_HOLE_DIAM     = 5.4;      // 出线孔径（CABLE 5mm + 0.4 间隙）
+GLAND_WALL_EXTRA    = 1.0;      // 壁厚之外的额外延伸（内外各加一点）
 
 // ---- 定位结构 ----
 ALIGNMENT_LIP_H     = 0.8;      // 分型面定位凸缘高度
