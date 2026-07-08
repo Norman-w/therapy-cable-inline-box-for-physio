@@ -1,5 +1,6 @@
 // ============================================================
 // 上半壳体 — Z ≥ 0，分型面在 Z=0
+// Boss 柱从内顶面到分型面，与下半 Boss 柱同外径对接
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -8,66 +9,75 @@ include <cable-gland.scad>
 include <cable-strain-relief.scad>
 
 module top_half() {
-    half_h = BOX_HALF_INNER_H;
+    half_h = BOX_HALF_INNER_H;             // = 9mm
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
-    boss_h = half_h - BOSS_FACE_GAP;
-    top_boss_od = BOSS_DIAMETER;
-    top_boss_id = SCREW_CLEARANCE;
+
+    // 上半 Boss 柱：外径同下半 Φ5，内孔 Φ2.3（螺丝通孔）
+    top_boss_od = BOSS_DIAMETER;            // = 5mm
+    top_boss_id = SCREW_CLEARANCE;          // = 2.3mm
 
     difference() {
         union() {
-            // ===== 壳体（含内衬凹槽，仅切壳壁不影响柱子）=====
+            // ===== 挖空的壳体 =====
             difference() {
-                // 挖空壳体
-                difference() {
-                    intersection() {
-                        rounded_rect_prism(
-                            BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
-                            r_outer, center = true);
-                        translate([0, 0, +BOX_OUTER_HEIGHT])
-                            cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
-                                 center = true);
-                    }
-                    intersection() {
-                        rounded_rect_prism(
-                            BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
-                            r_inner, center = true);
-                        translate([0, 0, +BOX_INNER_HEIGHT])
-                            cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
-                                 center = true);
-                    }
+                intersection() {
+                    rounded_rect_prism(
+                        BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
+                        r_outer, center = true);
+                    translate([0, 0, +BOX_OUTER_HEIGHT])
+                        cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
+                             center = true);
                 }
-                // 内衬凹槽（只切壳体内壁，Z=0到2mm深，1mm厚）
-                liner_groove_top();
+                intersection() {
+                    rounded_rect_prism(
+                        BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
+                        r_inner, center = true);
+                    translate([0, 0, +BOX_INNER_HEIGHT])
+                        cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
+                             center = true);
+                }
             }
 
-            // ===== 柱子（凹槽之后加，不受影响）=====
+            // ===== 线缆锯齿压紧（上半，齿尖向下）=====
             cable_clamp_teeth_top();
+
+            // ===== 线缆夹持柱（最内齿旁，夹住线缆防晃动）=====
             cable_guide_posts_top();
 
-            // ===== Boss 柱 =====
+            // ===== Boss 柱 ×4（内顶面根部锥形加固，到分型面与下半对接）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, 0])
                     difference() {
                         union() {
-                            cylinder(d = top_boss_od, h = boss_h - BOSS_REINFORCE_H, $fn = 32);
-                            translate([0, 0, boss_h - BOSS_REINFORCE_H])
-                                cylinder(d1 = top_boss_od, d2 = BOSS_REINFORCE_OD,
+                            // 直柱段（分型面到锥形根部）
+                            cylinder(d = top_boss_od,
+                                     h = half_h - BOSS_REINFORCE_H, $fn = 32);
+                            // 锥形根部（Φ5 过渡到 Φ8，在内顶面处加粗）
+                            translate([0, 0, half_h - BOSS_REINFORCE_H])
+                                cylinder(d1 = top_boss_od,
+                                         d2 = BOSS_REINFORCE_OD,
                                          h  = BOSS_REINFORCE_H, $fn = 32);
                         }
+                        // 内孔
                         translate([0, 0, -0.1])
-                            cylinder(d = top_boss_id, h = boss_h + 0.2, $fn = 32);
+                            cylinder(d = top_boss_id,
+                                     h = half_h + 0.2, $fn = 32);
                     }
             }
         }
 
-        // ===== 沉头孔 =====
+        // ===== 锥形沉头孔 ×4（锥尖嵌入 Boss 内孔 0.5mm，消除薄面）=====
         for (sx = [-1, 1], sy = [-1, 1]) {
-            translate([sx * BOSS_X, sy * BOSS_Y, boss_h - 0.3])
-                cylinder(d1 = SCREW_CLEARANCE, d2 = SCREW_HEAD_DIAMETER,
-                         h  = WALL_THICKNESS + 0.4, $fn = 32);
+            // 锥体从内顶面下方 0.5mm 开始，确保与 Boss 内孔重叠
+            translate([sx * BOSS_X, sy * BOSS_Y, half_h - 0.5])
+                cylinder(d1 = SCREW_CLEARANCE,
+                         d2 = SCREW_HEAD_DIAMETER,
+                         h  = WALL_THICKNESS + 0.6, $fn = 32);
         }
+
+        // ===== 定位凹槽 =====
+        alignment_groove();
 
         // ===== 电缆通道 =====
         for (mx = [-1, 1]) {
@@ -77,23 +87,21 @@ module top_half() {
     }
 }
 
-// 内衬凹槽：Z=0 到 Z=LINER_EXTEND，从内壁向外挖 1mm 深（嵌入壳壁）
-module liner_groove_top() {
-    gh = LINER_EXTEND + 0.1;
-    gox = BOX_INNER_LENGTH/2;
-    goy = BOX_INNER_WIDTH/2;
-    gix = gox - LINER_THICKNESS;
-    giy = goy - LINER_THICKNESS;
-    gr  = max(CORNER_RADIUS - WALL_THICKNESS, 0.5);
-    gri = max(gr - LINER_THICKNESS, 0.3);
+module alignment_groove() {
+    gh  = ALIGNMENT_LIP_H + 0.3;
+    gox = BOX_INNER_LENGTH / 2 + ALIGNMENT_LIP_W + PRINT_TOLERANCE;
+    goy = BOX_INNER_WIDTH  / 2 + ALIGNMENT_LIP_W + PRINT_TOLERANCE;
+    gix = BOX_INNER_LENGTH / 2 - PRINT_TOLERANCE;
+    giy = BOX_INNER_WIDTH  / 2 - PRINT_TOLERANCE;
 
-    // 凹槽 = 比内腔大1mm的环，只切壳壁
-    translate([-gox, -goy, 0])
     difference() {
-        // 外边界 = 比内腔大1mm（切进壳壁）
-        rounded_rect_prism((gox+LINER_THICKNESS)*2, (goy+LINER_THICKNESS)*2, gh, gr+LINER_THICKNESS, center=false);
-        // 内边界 = 内腔本身（保留）
-        translate([LINER_THICKNESS, LINER_THICKNESS, -0.1])
-            rounded_rect_prism(gox*2, goy*2, gh+0.2, gr, center=false);
+        translate([0, 0, 0])
+        linear_extrude(height = gh)
+            rounded_rect_2d(gox * 2, goy * 2,
+                            max(CORNER_RADIUS - WALL_THICKNESS + ALIGNMENT_LIP_W, 0.5));
+        translate([0, 0, -0.1])
+        linear_extrude(height = gh + 0.2)
+            rounded_rect_2d(gix * 2, giy * 2,
+                            max(CORNER_RADIUS - WALL_THICKNESS, 0.5));
     }
 }

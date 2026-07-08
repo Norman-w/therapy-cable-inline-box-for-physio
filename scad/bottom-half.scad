@@ -1,5 +1,6 @@
 // ============================================================
 // 下半壳体 — Z ≤ 0，分型面在 Z=0
+// 重构：先切电阻腔 → 再加 Boss柱+挡柱 → 最后切线缆孔
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -12,10 +13,12 @@ module bottom_half() {
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
 
-    difference() {
+    difference() {  // === 最终切除 ===
         union() {
-            // ===== 壳体 =====
+
+            // ===== 阶段 1: 挖空壳体 =====
             difference() {
+                // 外壳下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
@@ -24,6 +27,7 @@ module bottom_half() {
                         cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
                              center = true);
                 }
+                // 内腔下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
@@ -34,31 +38,31 @@ module bottom_half() {
                 }
             }
 
-            // ===== Boss 柱（端面缩减 BOSS_FACE_GAP 防挤压）=====
+            // ===== 阶段 2: 添加到已切割完成的壳体上 =====
+            // Boss 柱
             for (sx = [-1, 1], sy = [-1, 1]) {
-                boss_h = half_h - BOSS_FACE_GAP;
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
                     cylinder(d1 = BOSS_REINFORCE_OD, d2 = BOSS_DIAMETER,
                              h  = BOSS_REINFORCE_H, $fn = 32);
                     translate([0, 0, BOSS_REINFORCE_H])
-                        cylinder(d = BOSS_DIAMETER, h = boss_h - BOSS_REINFORCE_H, $fn = 32);
+                        cylinder(d = BOSS_DIAMETER, h = half_h - BOSS_REINFORCE_H, $fn = 32);
                 }
             }
 
-            // ===== 内衬密封圈（1mm厚，向下2mm+向上2mm凸出）=====
-            inner_liner();
-
-            // 线缆锯齿
+            // 线缆锯齿压紧（下半，齿尖向上）
             cable_clamp_teeth_bottom();
+
+            // 定位凸缘
+            alignment_lip();
         }
 
-        // ===== Boss 导孔 =====
+        // ===== 最终切除：Boss 导孔 =====
         for (sx = [-1, 1], sy = [-1, 1]) {
             translate([sx * BOSS_X, sy * BOSS_Y, -half_h - 0.1])
                 cylinder(d = BOSS_PILOT_HOLE, h = half_h + 0.4, $fn = 24);
         }
 
-        // ===== 电缆通道 =====
+        // ===== 最终切除：电缆通道（会切过挡柱，形成线缆导槽）=====
         for (mx = [-1, 1]) {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])
                 cable_channel_half_bottom();
@@ -66,34 +70,22 @@ module bottom_half() {
     }
 }
 
-// 内衬密封圈：嵌入壳壁1mm，内面与原腔内壁齐平，Boss和过线处留空
-module inner_liner() {
-    lh = LINER_EXTEND * 2;  // 4mm 总高
-    lox = BOX_INNER_LENGTH/2;
-    loy = BOX_INNER_WIDTH/2;
-    lr  = max(CORNER_RADIUS - WALL_THICKNESS, 0.5);
+module alignment_lip() {
+    lh  = ALIGNMENT_LIP_H;
+    lw  = ALIGNMENT_LIP_W;
+    lox = BOX_INNER_LENGTH / 2 + lw;
+    loy = BOX_INNER_WIDTH  / 2 + lw;
+    lix = BOX_INNER_LENGTH / 2 - PRINT_TOLERANCE;
+    liy = BOX_INNER_WIDTH  / 2 - PRINT_TOLERANCE;
 
-    // 外圈 = 比内腔大1mm（嵌入壳壁），内圈 = 内腔（齐平）
-    translate([-lox - LINER_THICKNESS, -loy - LINER_THICKNESS, -LINER_EXTEND])
     difference() {
-        // 外边界：比内腔大1mm
-        rounded_rect_prism(
-            (lox + LINER_THICKNESS)*2, (loy + LINER_THICKNESS)*2, lh,
-            lr + LINER_THICKNESS, center=false);
-        // 内边界：原腔内壁（保留，齐平）
-        translate([LINER_THICKNESS, LINER_THICKNESS, -0.1])
-            rounded_rect_prism(lox*2, loy*2, lh + 0.2, lr, center=false);
-        // 挖空 Boss 位
-        for (sx = [-1, 1], sy = [-1, 1]) {
-            translate([lox + LINER_THICKNESS + sx*BOSS_X,
-                       loy + LINER_THICKNESS + sy*BOSS_Y, -1])
-                cylinder(d = BOSS_DIAMETER + 4, h = lh + 2, $fn = 32);
-        }
-        // 挖空过线处
-        for (mx = [-1, 1]) {
-            translate([lox + LINER_THICKNESS + mx*BOX_INNER_LENGTH/2,
-                       loy + LINER_THICKNESS, -1])
-                cube([WALL_THICKNESS*3, CABLE_DIAMETER + 4, lh + 2], center = true);
-        }
+        translate([0, 0, 0])
+        linear_extrude(height = lh)
+            rounded_rect_2d(lox * 2, loy * 2,
+                            max(CORNER_RADIUS - WALL_THICKNESS + lw, 0.5));
+        translate([0, 0, -0.1])
+        linear_extrude(height = lh + 0.2)
+            rounded_rect_2d(lix * 2, liy * 2,
+                            max(CORNER_RADIUS - WALL_THICKNESS, 0.5));
     }
 }
