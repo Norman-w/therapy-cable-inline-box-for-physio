@@ -62,12 +62,17 @@ module cable_guide_posts_top() {
     post_h = half_h + GUIDE_POST_BELOW;  // 9 + 5 = 14mm
     s = GUIDE_POST_SIZE;
 
+    // 最内齿立面 X 坐标
+    tooth_face_x = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - (TOOTH_COUNT-1)*TOOTH_SPACING;
+
     for (mx = [-1, 1]) {
+        // 柱远心端与最内齿立面平齐
+        x_corner = mx > 0 ? tooth_face_x - s
+                          : -tooth_face_x;
         for (sy = [-1, 1]) {
-            // 柱内边距 Y=0 正好 2.5mm → 间隙 5mm 夹住线缆
             y_pos = sy > 0 ? GUIDE_POST_Y_GAP
                            : -GUIDE_POST_Y_GAP - s;
-            translate([mx * GUIDE_POST_X_OFFSET, y_pos, -GUIDE_POST_BELOW])
+            translate([x_corner, y_pos, -GUIDE_POST_BELOW])
                 cube([s, s, post_h]);
         }
     }
