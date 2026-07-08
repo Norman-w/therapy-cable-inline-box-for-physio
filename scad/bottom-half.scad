@@ -50,8 +50,11 @@ module bottom_half() {
                 }
             }
 
-            // 线缆锯齿压紧（下半，齿尖向上）
+            // 线缆锯齿压紧（下半，齿尖向上，3齿）
             cable_clamp_teeth_bottom();
+
+            // 线缆夹持柱
+            cable_guide_posts_bottom();
 
             // 定位凸缘
             alignment_lip();

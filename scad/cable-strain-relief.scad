@@ -12,28 +12,10 @@ TOOTH_GAP       = 4.0;   // 上下齿尖间隙
 TOOTH_SPACING   = 4.0;   // 齿间距 X向
 TOOTH_FIRST_X   = 4.0;   // 第一齿距内端面
 
+// 下半 3 齿（原来上半的3齿）
 module cable_clamp_teeth_bottom() {
     half_h = BOX_HALF_INNER_H;
     tooth_h = half_h - TOOTH_GAP/2;
-    bw = TOOTH_BASE_X;
-    tw = TOOTH_TOP_X;
-    w  = TOOTH_WIDTH_Y;
-    // 下半每侧 2 齿，向中心偏移半个齿距 → 3包2 交错咬合
-    count = TOOTH_COUNT - 1;
-    offset = TOOTH_SPACING / 2;
-
-    for (mx = [-1, 1]) {
-        for (i = [0 : count - 1]) {
-            tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - offset - i * TOOTH_SPACING;
-            translate([mx * tx, 0, -half_h])
-                _tooth(bw, tw, tooth_h, w, mx < 0, invert = false);
-        }
-    }
-}
-
-module cable_clamp_teeth_top() {
-    half_h = BOX_HALF_INNER_H;
-    tooth_h = half_h - TOOTH_GAP/2;   // 7mm
     bw = TOOTH_BASE_X;
     tw = TOOTH_TOP_X;
     w  = TOOTH_WIDTH_Y;
@@ -41,7 +23,25 @@ module cable_clamp_teeth_top() {
     for (mx = [-1, 1]) {
         for (i = [0 : TOOTH_COUNT - 1]) {
             tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - i * TOOTH_SPACING;
-            // 齿尖在 Z=+2, 底在 Z=+9
+            translate([mx * tx, 0, -half_h])
+                _tooth(bw, tw, tooth_h, w, mx < 0, invert = false);
+        }
+    }
+}
+
+// 上半 2 齿（原来下半的2齿，偏移半齿距交错）
+module cable_clamp_teeth_top() {
+    half_h = BOX_HALF_INNER_H;
+    tooth_h = half_h - TOOTH_GAP/2;
+    bw = TOOTH_BASE_X;
+    tw = TOOTH_TOP_X;
+    w  = TOOTH_WIDTH_Y;
+    count = TOOTH_COUNT - 1;
+    offset = TOOTH_SPACING / 2;
+
+    for (mx = [-1, 1]) {
+        for (i = [0 : count - 1]) {
+            tx = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - offset - i * TOOTH_SPACING;
             translate([mx * tx, 0, TOOTH_GAP/2])
                 _tooth(bw, tw, tooth_h, w, mx < 0, invert = true);
         }
@@ -49,51 +49,42 @@ module cable_clamp_teeth_top() {
 }
 
 // ============================================================
-// 线缆夹持柱 — 上半壳最内齿旁，2柱夹住线缆防晃动
-// 柱高从内顶面到分型面下 5mm，间隙 5mm 夹住线缆
+// 线缆夹持柱 — 下半壳最内齿旁，柱从底板伸到分型面上5mm
 // ============================================================
-GUIDE_POST_X_OFFSET = 12.0;  // 柱远心端与最内齿立面(X=14)平齐
 GUIDE_POST_Y_GAP     = 2.5;   // 柱 Y 半间距（间隙 5mm）
 GUIDE_POST_SIZE      = 2.0;   // 柱截面边长
-GUIDE_POST_BELOW     = 5.0;   // 柱伸出分型面以下长度
+GUIDE_POST_ABOVE     = 5.0;   // 柱伸出分型面以上长度
 GUIDE_POST_BASE_EXTRA = 1.5;  // 根部加固每侧加宽
 GUIDE_POST_BASE_H    = 3.0;   // 根部加固段高度
 
-module cable_guide_posts_top() {
+module cable_guide_posts_bottom() {
     half_h = BOX_HALF_INNER_H;
-    post_h = half_h + GUIDE_POST_BELOW;   // 14mm
+    post_h = half_h + GUIDE_POST_ABOVE;
     s  = GUIDE_POST_SIZE;
-    bs = s + GUIDE_POST_BASE_EXTRA * 2;   // 底座宽 5mm
-    upper_h = post_h - GUIDE_POST_BASE_H; // 上部 11mm
-    offset = GUIDE_POST_BASE_EXTRA;        // 上部偏移 1.5mm
+    bs = s + GUIDE_POST_BASE_EXTRA * 2;
+    upper_h = post_h - GUIDE_POST_BASE_H;
+    off = GUIDE_POST_BASE_EXTRA;
 
     tooth_face_x = BOX_INNER_LENGTH/2 - TOOTH_FIRST_X - (TOOTH_COUNT-1)*TOOTH_SPACING;
 
     for (mx = [-1, 1]) {
-        // 柱远端（远心端）与齿立面平齐
-        x_narrow = mx > 0 ? tooth_face_x - s      // 窄柱角: 12→14
-                          : -tooth_face_x;          // 窄柱角: -14→-12
-        x_wide   = mx > 0 ? tooth_face_x - bs     // 宽柱角: 9→14
-                          : -tooth_face_x;          // 宽柱角: -14→-9
+        x_narrow = mx > 0 ? tooth_face_x - s : -tooth_face_x;
+        x_wide   = mx > 0 ? tooth_face_x - bs : -tooth_face_x;
 
         for (sy = [-1, 1]) {
-            y_narrow = sy > 0 ? GUIDE_POST_Y_GAP           // +Y窄柱
-                              : -GUIDE_POST_Y_GAP - s;     // -Y窄柱
-            y_wide   = sy > 0 ? GUIDE_POST_Y_GAP - offset  // +Y宽柱
-                              : -GUIDE_POST_Y_GAP - s - offset;  // -Y宽柱
+            y_narrow = sy > 0 ? GUIDE_POST_Y_GAP : -GUIDE_POST_Y_GAP - s;
+            y_wide   = sy > 0 ? GUIDE_POST_Y_GAP - off : -GUIDE_POST_Y_GAP - s - off;
 
-            translate([x_narrow, y_narrow, -GUIDE_POST_BELOW]) {
-                // 下部细柱（靠分型面）
-                cube([s, s, upper_h]);
-                // 锥形加固底座：hull 两块方板 = 四棱锥台
-                translate([0, 0, upper_h])
+            translate([x_wide, y_wide, -half_h]) {
+                // 根部锥形加固（靠底板，hull过渡）
                 hull() {
-                    // 窄端（接细柱）
-                    cube([s, s, 0.01]);
-                    // 宽端（贴壳体顶壁）
-                    translate([x_wide - x_narrow, y_wide - y_narrow, GUIDE_POST_BASE_H - 0.01])
-                        cube([bs, bs, 0.01]);
+                    cube([bs, bs, 0.01]);  // 宽底
+                    translate([x_narrow - x_wide, y_narrow - y_wide, GUIDE_POST_BASE_H - 0.01])
+                        cube([s, s, 0.01]);  // 窄顶
                 }
+                // 上部细柱
+                translate([x_narrow - x_wide, y_narrow - y_wide, GUIDE_POST_BASE_H])
+                    cube([s, s, upper_h]);
             }
         }
     }
