@@ -85,9 +85,15 @@ module cable_guide_posts_top() {
             translate([x_narrow, y_narrow, -GUIDE_POST_BELOW]) {
                 // 下部细柱（靠分型面）
                 cube([s, s, upper_h]);
-                // 加宽底座（靠壳体顶壁）
-                translate([x_wide - x_narrow, y_wide - y_narrow, upper_h])
-                    cube([bs, bs, GUIDE_POST_BASE_H]);
+                // 锥形加固底座：hull 两块方板 = 四棱锥台
+                translate([0, 0, upper_h])
+                hull() {
+                    // 窄端（接细柱）
+                    cube([s, s, 0.01]);
+                    // 宽端（贴壳体顶壁）
+                    translate([x_wide - x_narrow, y_wide - y_narrow, GUIDE_POST_BASE_H - 0.01])
+                        cube([bs, bs, 0.01]);
+                }
             }
         }
     }
