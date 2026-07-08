@@ -72,9 +72,6 @@ module top_half() {
         // ===== 定位凹槽 =====
         alignment_groove();
 
-        // ===== 电阻上盖凹槽 =====
-        resistor_cavity_top(half_h * 0.35);
-
         // ===== 电缆通道 =====
         for (mx = [-1, 1]) {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])

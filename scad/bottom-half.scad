@@ -16,7 +16,7 @@ module bottom_half() {
     difference() {  // === 最终切除 ===
         union() {
 
-            // ===== 阶段 1: 挖空壳体 + 切除电阻腔（不影响后续添加的柱）=====
+            // ===== 阶段 1: 挖空壳体 =====
             difference() {
                 // 外壳下半
                 intersection() {
@@ -36,8 +36,6 @@ module bottom_half() {
                         cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
                              center = true);
                 }
-                // 电阻型腔（先切，后面加的柱子就不会被切到）
-                resistor_cavity_bottom(half_h * 0.7);
             }
 
             // ===== 阶段 2: 添加到已切割完成的壳体上 =====
