@@ -1,6 +1,6 @@
 // ============================================================
 // 下半壳体 — Z ≤ 0，分型面在 Z=0
-// Boss 柱从底板到分型面，与上半 Boss 柱对接
+// 重构：先切电阻腔 → 再加 Boss柱+挡柱 → 最后切线缆孔
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -13,10 +13,12 @@ module bottom_half() {
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
 
-    difference() {
+    difference() {  // === 最终切除 ===
         union() {
-            // ===== 挖空的壳体 =====
+
+            // ===== 阶段 1: 挖空壳体 + 切除电阻腔（不影响后续添加的柱）=====
             difference() {
+                // 外壳下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_OUTER_LENGTH, BOX_OUTER_WIDTH, BOX_OUTER_HEIGHT,
@@ -25,6 +27,7 @@ module bottom_half() {
                         cube([BOX_OUTER_LENGTH * 2, BOX_OUTER_WIDTH * 2, BOX_OUTER_HEIGHT * 2],
                              center = true);
                 }
+                // 内腔下半
                 intersection() {
                     rounded_rect_prism(
                         BOX_INNER_LENGTH, BOX_INNER_WIDTH, BOX_INNER_HEIGHT,
@@ -33,39 +36,35 @@ module bottom_half() {
                         cube([BOX_INNER_LENGTH * 2, BOX_INNER_WIDTH * 2, BOX_INNER_HEIGHT * 2],
                              center = true);
                 }
+                // 电阻型腔（先切，后面加的柱子就不会被切到）
+                resistor_cavity_bottom(half_h * 0.7);
             }
 
-            // ===== Boss 柱 ×4（根部锥形加固，从内底板到分型面）=====
+            // ===== 阶段 2: 添加到已切割完成的壳体上 =====
+            // Boss 柱
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
-                    // 锥形根部：Φ8 过渡到 Φ5
-                    cylinder(d1 = BOSS_REINFORCE_OD,
-                             d2 = BOSS_DIAMETER,
+                    cylinder(d1 = BOSS_REINFORCE_OD, d2 = BOSS_DIAMETER,
                              h  = BOSS_REINFORCE_H, $fn = 32);
-                    // 直柱段
                     translate([0, 0, BOSS_REINFORCE_H])
-                        cylinder(d = BOSS_DIAMETER,
-                                 h = half_h - BOSS_REINFORCE_H, $fn = 32);
+                        cylinder(d = BOSS_DIAMETER, h = half_h - BOSS_REINFORCE_H, $fn = 32);
                 }
             }
 
-            // ===== 线缆 S 型绕柱加固 =====
+            // 线缆挡柱（S 型绕线）
             cable_strain_relief_posts();
 
-            // ===== 定位凸缘 =====
+            // 定位凸缘
             alignment_lip();
         }
 
-        // ===== Boss 导孔（贯穿锥形底座 + 直柱段）=====
+        // ===== 最终切除：Boss 导孔 =====
         for (sx = [-1, 1], sy = [-1, 1]) {
             translate([sx * BOSS_X, sy * BOSS_Y, -half_h - 0.1])
                 cylinder(d = BOSS_PILOT_HOLE, h = half_h + 0.4, $fn = 24);
         }
 
-        // ===== 电阻型腔 =====
-        resistor_cavity_bottom(half_h * 0.7);
-
-        // ===== 电缆通道 =====
+        // ===== 最终切除：电缆通道（会切过挡柱，形成线缆导槽）=====
         for (mx = [-1, 1]) {
             translate([mx * BOX_OUTER_LENGTH / 2, 0, 0])
                 cable_channel_half_bottom();
