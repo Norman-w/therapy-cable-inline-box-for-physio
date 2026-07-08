@@ -52,7 +52,7 @@ module cable_clamp_teeth_top() {
 // 线缆夹持柱 — 上半壳最内齿旁，2柱夹住线缆防晃动
 // 柱高从内顶面到分型面下 5mm，间隙 5mm 夹住线缆
 // ============================================================
-GUIDE_POST_X_OFFSET = 11.0;  // 柱 X 坐标（距中心）
+GUIDE_POST_X_OFFSET = 13.0;  // 柱 X 坐标（距中心，间隙26mm放22mm电阻）
 GUIDE_POST_Y_GAP     = 2.5;   // 柱 Y 半间距（间隙 5mm）
 GUIDE_POST_SIZE      = 3.0;   // 柱截面边长
 GUIDE_POST_BELOW     = 5.0;   // 柱伸出分型面以下长度
