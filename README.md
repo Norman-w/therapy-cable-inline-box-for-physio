@@ -1,0 +1,39 @@
+# therapy-cable-inline-box-for-physio
+
+理疗仪线缆串联保护盒（OpenSCAD 参数化外壳 + Web STL 预览）。
+
+## 版本说明
+
+### v1 — 水泥电阻方案（已弃用）
+
+最初方案：在理疗仪线缆中间串联 **5W 水泥电阻**，用上下对开壳体固定电阻体、引脚焊接区与线缆出线孔，起到限流/保护作用。
+
+仓库中现有 OpenSCAD 模型（`scad/`、电阻型腔等）对应的就是这一版。
+
+**弃用原因：** 实测水泥电阻发热过高，壳体与使用环境无法可靠散热，存在烫手与安全风险，因此不再推进水泥电阻方案。
+
+### v2 — 直流电机调速器方案（当前方向）
+
+因发热问题，第二版改为接入 **直流电机调速器**，用可调功率方式替代串联水泥电阻，避免大功率电阻持续产热。
+
+本版将围绕调速器模组的外形、接线与壳体布局重新设计（尺寸与内部结构预计与 v1 不同）。
+
+选用模组与尺寸资料见：[docs/synairy-esc-adaptor-v02/](docs/synairy-esc-adaptor-v02/)（Synairy ESC-Adaptor V02，PCB **32 × 12 mm**）。
+
+## 仓库结构
+
+```
+docs/synairy-esc-adaptor-v02/   v2 调速器元件资料（尺寸 / 参数 / 原图）
+scad/                           OpenSCAD 参数化模型（目前仍为 v1 水泥电阻盒）
+web/                            Three.js STL 预览与下载页
+index.html                      跳转到 web/index.html
+```
+
+## 本地预览（v1 模型）
+
+```bash
+cd web
+python3 server.py
+```
+
+浏览器打开提示的地址即可查看/下载 STL。
