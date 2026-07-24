@@ -15,10 +15,12 @@ MODULE_PCB_THICK    = 1.6;
 MODULE_CLEARANCE    = 0.6;
 
 // 模组安装孔（板心坐标）— 盒内螺丝锁入下半罗马柱
+// 对角：距左上 / 右下顶点 X、Y 各约 1.5mm
 MODULE_HOLE_DIAM    = 2.0;
+MODULE_HOLE_INSET   = 1.5;
 MODULE_HOLES = [
-    [-12.50,  3.40],
-    [ 13.20, -4.10]
+    [-(MODULE_LENGTH/2 - MODULE_HOLE_INSET),  +(MODULE_WIDTH/2 - MODULE_HOLE_INSET)], // 左上 → (-14.5, +4.5)
+    [+(MODULE_LENGTH/2 - MODULE_HOLE_INSET),  -(MODULE_WIDTH/2 - MODULE_HOLE_INSET)]  // 右下 → (+14.5, -4.5)
 ];
 
 // ---- 电位器轴（板左缘 10~15mm，板宽居中）----
@@ -26,7 +28,7 @@ MODULE_HOLES = [
 KNOB_CENTER_X       = -3.5;
 KNOB_CENTER_Y       =  0.0;
 KNOB_SHAFT_DIAM     =  5.0;
-KNOB_WINDOW_DIAM    =  5.2;
+KNOB_WINDOW_DIAM    =  6.5;     // 开孔加大，消化打印公差、保证轴易装
 KNOB_BODY_DIAM      = 10.0;
 // 腔内净高：罗马柱顶面以上到顶盖内壁 = 7.5（装板不晃、轴能露出）
 KNOB_CAVITY_H       =  7.5;
