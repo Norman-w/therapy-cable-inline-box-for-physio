@@ -1,7 +1,7 @@
 // ============================================================
 // 下半壳体 — Z ≤ 0，分型面在 Z=0
-// - 四角 Boss：壳外 M2 合盖
-// - 模组罗马柱：盒内螺丝锁 PCB（与线缆立柱错开）
+// - 四角 Boss + 底面沉头：合盖螺丝从此面拧入（顶面看不见螺丝）
+// - 模组罗马柱：盒内锁 PCB
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -15,8 +15,8 @@ module bottom_half() {
     half_h = BOX_HALF_INNER_H;
     r_outer = CORNER_RADIUS;
     r_inner = max(r_outer - WALL_THICKNESS, 0.5);
-    shell_boss_h = half_h;                      // 合盖柱到分型面
-    module_boss_h = half_h + PCB_BOTTOM_Z;      // 罗马柱到 PCB 底
+    shell_boss_h = half_h;
+    module_boss_h = half_h + PCB_BOTTOM_Z;
 
     difference() {
         union() {
@@ -42,7 +42,7 @@ module bottom_half() {
                 module_cavity_bottom();
             }
 
-            // ===== 合盖四角 Boss =====
+            // ===== 合盖四角 Boss（通孔，螺丝自底面穿入）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 translate([sx * BOSS_X, sy * BOSS_Y, -half_h]) {
                     cylinder(d1 = BOSS_REINFORCE_OD, d2 = BOSS_DIAMETER,
@@ -55,7 +55,7 @@ module bottom_half() {
                 }
             }
 
-            // ===== 模组罗马柱（盒内锁 PCB）=====
+            // ===== 模组罗马柱 =====
             for (p = MODULE_HOLES) {
                 translate([p[0], p[1], -half_h]) {
                     cylinder(d1 = MODULE_BOSS_REINFORCE_OD,
@@ -75,10 +75,16 @@ module bottom_half() {
             alignment_lip();
         }
 
-        // 合盖导孔
+        // 合盖：通孔 + 底面外沉头（头在底面，顶面看不见）
         for (sx = [-1, 1], sy = [-1, 1]) {
             translate([sx * BOSS_X, sy * BOSS_Y, -half_h - 0.1])
-                cylinder(d = BOSS_PILOT_HOLE, h = shell_boss_h + 0.4, $fn = 24);
+                cylinder(d = SCREW_CLEARANCE,
+                         h = shell_boss_h + WALL_THICKNESS + 0.4, $fn = 24);
+            translate([sx * BOSS_X, sy * BOSS_Y,
+                       -half_h - WALL_THICKNESS - 0.1])
+                cylinder(d1 = SCREW_HEAD_DIAMETER,
+                         d2 = SCREW_CLEARANCE,
+                         h = WALL_THICKNESS + 0.4, $fn = 32);
         }
 
         // 模组罗马柱导孔

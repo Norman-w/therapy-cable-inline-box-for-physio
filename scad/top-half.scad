@@ -1,6 +1,6 @@
 // ============================================================
 // 上半壳体 — Z ≥ 0，分型面在 Z=0
-// 四角外露沉头螺丝合盖；轴孔 / 长方形数码窗 / 按键孔
+// 旋钮 / 数码窗在此面（无合盖沉头孔）；四角为导孔柱承接底面螺丝
 // ============================================================
 include <parameters.scad>
 include <utilities.scad>
@@ -40,7 +40,7 @@ module top_half() {
 
             cable_clamp_teeth_top();
 
-            // ===== 合盖四角螺丝筒 =====
+            // ===== 合盖四角导孔柱（承接自底面拧入的螺丝）=====
             for (sx = [-1, 1], sy = [-1, 1]) {
                 bh = boss_h - boss_base;
                 translate([sx * BOSS_X, sy * BOSS_Y, boss_base])
@@ -56,20 +56,13 @@ module top_half() {
                                          $fn = 32);
                         }
                         translate([0, 0, -0.1])
-                            cylinder(d = SCREW_CLEARANCE,
-                                     h = bh + 0.2, $fn = 32);
+                            cylinder(d = BOSS_PILOT_HOLE,
+                                     h = bh + 0.2, $fn = 24);
                     }
             }
         }
 
-        // ===== 壳外沉头孔（四角合盖）=====
-        for (sx = [-1, 1], sy = [-1, 1]) {
-            translate([sx * BOSS_X, sy * BOSS_Y, half_h - 0.2])
-                cylinder(d1 = SCREW_CLEARANCE,
-                         d2 = SCREW_HEAD_DIAMETER,
-                         h = WALL_THICKNESS + 0.5, $fn = 32);
-        }
-
+        // 顶面不开合盖沉头孔 — 仅旋钮 / 数码窗
         module_cavity_top();
         module_windows_top();
         alignment_groove();
