@@ -1,61 +1,94 @@
 // ============================================================
-// 理疗仪线缆串联电阻保护盒 — 全局参数
+// 理疗仪线缆串联保护盒 — 全局参数（v2 调速器）
 // therapy-cable-inline-box-for-physio
+//
+// 模组：Synairy ESC-Adaptor V02（插针拆除，焊线引出）
+// 布局：自板左缘 10~15 轴 / 18.5~27 数码管；二者板宽居中
 // ============================================================
 
-// ---- 电阻参数 (5W 水泥电阻，矩形封装) ----
-RESISTOR_BODY_WIDTH  = 9.0;     // 电阻体宽度 mm（垂直 X 轴）
-RESISTOR_BODY_HEIGHT = 9.0;     // 电阻体高度 mm（垂直 Z 轴）
-RESISTOR_BODY_LENGTH = 22.0;    // 电阻体长度 mm（沿 X 轴 / 线缆方向）
-RESISTOR_LEAD_DIAMETER = 0.8;   // 引脚线径 mm
-RESISTOR_LEAD_LENGTH   = 8.0;   // 引脚保留长度（焊接端）
-RESISTOR_CLEARANCE     = 0.4;   // 型腔与电阻体间隙
+// ===== 分区：常量/配置 =====
 
-// ---- 线缆参数 ----
-CABLE_DIAMETER      = 5.0;      // 线缆外径 mm
-CABLE_STRIP_LENGTH  = 20.0;     // 剥线长度（电阻 + 焊接区域）
+// ---- 模组 PCB（32×12，插针不计）----
+MODULE_LENGTH       = 32.0;
+MODULE_WIDTH        = 12.0;
+MODULE_PCB_THICK    = 1.6;
+MODULE_CLEARANCE    = 0.6;
 
-// ---- 壳体参数 ----
-WALL_THICKNESS      = 1.6;      // 壁厚 mm（FDM 0.4mm 喷嘴 × 4 层）
-BOX_INNER_LENGTH    = 60.0;     // 内部长度 mm (+10)
-BOX_INNER_WIDTH     = 25.0;     // 内部宽度 mm (+5)
-BOX_INNER_HEIGHT    = 18.0;     // 内部总高度 mm（= 每半 9mm）
+// 模组安装孔（板心坐标）— 盒内螺丝锁入下半罗马柱
+MODULE_HOLE_DIAM    = 2.0;
+MODULE_HOLES = [
+    [-12.50,  3.40],
+    [ 13.20, -4.10]
+];
 
-// 导出尺寸
+// ---- 电位器轴（板左缘 10~15mm，板宽居中）----
+// 板心坐标：X = (10+15)/2 - 16 = -3.5
+KNOB_CENTER_X       = -3.5;
+KNOB_CENTER_Y       =  0.0;
+KNOB_SHAFT_DIAM     =  5.0;
+KNOB_WINDOW_DIAM    =  5.2;
+KNOB_BODY_DIAM      = 10.0;
+// 腔内净高：罗马柱顶面以上到顶盖内壁 = 7.5（装板不晃、轴能露出）
+KNOB_CAVITY_H       =  7.5;
+KNOB_BODY_HEIGHT    = KNOB_CAVITY_H;  // 电位器本体占满该净高
+KNOB_CAP_DIAM       = 10.7;
+KNOB_CAP_HEIGHT     = 10.0;
+
+// ---- 数码管（板左缘 18.5~27mm，长边 12，板宽居中）----
+// 板心：X = (18.5+27)/2 - 16 = 6.75；沿板长 8.5，沿板宽 12
+DISPLAY_CENTER_X    =  6.75;
+DISPLAY_CENTER_Y    =  0.0;
+DISPLAY_SIZE_X      =  8.5;     // 18.5~27
+DISPLAY_SIZE_Y      = 12.0;     // 长边
+DISPLAY_WINDOW_GAP  =  0.2;
+DISPLAY_HEIGHT_ABOVE = 6.5;     // 可调：壳内数码管高度
+
+// ---- 线缆 ----
+CABLE_DIAMETER      = 5.0;
+CABLE_STRIP_LENGTH  = 18.0;
+
+// ---- 壳体内腔 ----
+// 上半内高 = KNOB_CAVITY_H（PCB 顶在分型面）；下半对称
+BOX_INNER_LENGTH    = 70.0;
+BOX_INNER_WIDTH     = 22.0;
+BOX_INNER_HEIGHT    = KNOB_CAVITY_H * 2;  // 15：上半 7.5 给旋钮柱
+
+WALL_THICKNESS      = 1.6;
 BOX_OUTER_LENGTH    = BOX_INNER_LENGTH + WALL_THICKNESS * 2;
 BOX_OUTER_WIDTH     = BOX_INNER_WIDTH  + WALL_THICKNESS * 2;
 BOX_OUTER_HEIGHT    = BOX_INNER_HEIGHT + WALL_THICKNESS * 2;
-BOX_HALF_INNER_H    = BOX_INNER_HEIGHT / 2;  // 每半内腔深度
+BOX_HALF_INNER_H    = BOX_INNER_HEIGHT / 2;
 
-// ---- 圆角参数 ----
-CORNER_RADIUS       = 3.0;      // 外角圆角半径 mm
+CORNER_RADIUS       = 3.0;
 
-// ---- Boss 柱 / 螺丝参数 (M2 自攻螺丝) ----
-BOSS_DIAMETER       = 5.0;      // Boss 柱外径
-BOSS_PILOT_HOLE     = 1.7;      // M2 自攻导孔直径
-BOSS_REINFORCE_OD   = 8.0;      // Boss 柱根部加固外径
-BOSS_REINFORCE_H     = 3.0;      // 锥形加固段高度
-BOSS_X              = 22.0;     // Boss 柱 X 偏移（距中心）
-BOSS_Y              = 9.0;      // Boss 柱 Y 偏移（距中心）
-SCREW_CLEARANCE     = 2.3;      // 上半壳体螺丝通孔
-SCREW_HEAD_DIAMETER = 5.0;      // 沉头孔直径（M2 pan head）
-SCREW_HEAD_DEPTH    = 1.8;      // 沉头孔深度
-SCREW_BOSS_OD       = 6.5;      // 上半螺丝位凸台外径（壳体外的定位圆柱）
-SCREW_BOSS_HEIGHT   = 0.6;      // 凸台高度
+// ---- 合盖螺丝 Boss（壳外 4 颗 M2，四角）----
+BOSS_DIAMETER       = 5.0;
+BOSS_PILOT_HOLE     = 1.7;
+BOSS_REINFORCE_OD   = 7.5;
+BOSS_REINFORCE_H    = 2.5;
+BOSS_X              = 28.0;
+BOSS_Y              =  7.5;
+SCREW_CLEARANCE     = 2.3;
+SCREW_HEAD_DIAMETER = 5.0;
+SCREW_HEAD_DEPTH    = 1.8;
+
+// ---- 模组罗马柱（盒内锁 PCB，仅下半）----
+MODULE_BOSS_DIAMETER     = 5.0;
+MODULE_BOSS_PILOT        = 1.7;
+MODULE_BOSS_REINFORCE_OD = 7.0;
+MODULE_BOSS_REINFORCE_H  = 2.0;
+
+PCB_TOP_Z           = 0.0;
+PCB_BOTTOM_Z        = PCB_TOP_Z - MODULE_PCB_THICK;
 
 // ---- 电缆出线孔 ----
-// 孔只穿过壁厚 + 少量延伸，不深入内腔，避免打到内部结构
-GLAND_HOLE_DIAM     = 5.4;      // 出线孔径（CABLE 5mm + 0.4 间隙）
-GLAND_WALL_EXTRA    = 1.5;      // 壁厚之外的额外延伸（向内多 0.5mm）
+GLAND_HOLE_DIAM     = 5.4;
+GLAND_WALL_EXTRA    = 1.5;
+GLAND_OUTER_EXTEND  = 0.0;
 
-// ---- 定位结构 ----
-ALIGNMENT_LIP_H     = 0.8;      // 分型面定位凸缘高度
-ALIGNMENT_LIP_W     = 0.8;      // 凸缘宽度（壳体厚度的一半）
+ALIGNMENT_LIP_H     = 0.8;
+ALIGNMENT_LIP_W     = 0.8;
+PRINT_TOLERANCE     = 0.2;
 
-// ---- 打印公差 ----
-PRINT_TOLERANCE     = 0.2;      // 配合面公差
-
-// ===== 视觉模式 =====
-VISUAL = false;  // true=分色装配展示, false=仅下半壳体（导出模式）
-
-$fn = 64;  // 全局圆滑度
+VISUAL = false;
+$fn = 64;

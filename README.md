@@ -20,11 +20,18 @@
 
 选用模组与尺寸资料见：[docs/synairy-esc-adaptor-v02/](docs/synairy-esc-adaptor-v02/)（Synairy ESC-Adaptor V02，PCB **32 × 12 mm**）。
 
+### v2 壳体要点
+
+- 内腔约 **70 × 22 × 15 mm**（上半净高 7.5 给旋钮柱；加长避免罗马柱与线缆立柱冲突）
+- 壳外 **4× M2** 四角合盖；盒内 **2× 罗马柱** 锁 PCB
+- 开窗：轴在板左 10~15（⌀5.2）、数码管 18.5~27 且长边 12；二者板宽居中；开关不开孔
+
 ## 仓库结构
 
 ```
 docs/synairy-esc-adaptor-v02/   v2 调速器元件资料（尺寸 / 参数 / 原图）
-scad/                           OpenSCAD 参数化模型（目前仍为 v1 水泥电阻盒）
+scad/                           OpenSCAD 参数化模型（v2 调速器盒）
+stl/                            导出的 STL（gitignore 可忽略）
 web/                            Three.js STL 预览与下载页
 index.html                      跳转到 web/index.html
 ```

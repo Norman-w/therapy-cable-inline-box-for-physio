@@ -32,7 +32,7 @@
 <body>
 <div class="info-panel">
   <h1>🧊 therapy-cable-inline-box-for-physio</h1>
-  <div class="subtitle">理疗仪线缆串联电阻保护盒</div>
+  <div class="subtitle">理疗仪线缆串联保护盒 · v2 调速器</div>
   <div class="stats">Model: <span id="model-name">—</span><br>Triangles: <span id="tri-count">—</span><br>Size: <span id="bbox-size">—</span></div>
   <div class="switcher">
     <button id="btn-bottom" onclick="switchModel('bottom')">🔽 下半</button>
@@ -90,7 +90,7 @@ controls.minDistance = 5; controls.maxDistance = 150; controls.target.set(0,0,0)
 
 const STL_BASE = (() => { const p = window.location.pathname; return p.replace(/\/(web\/)?(index\.html)?$/,'').replace(/\/+$/,''); })();
 const TS = '?v=' + Date.now();
-const URLS = { bottom: STL_BASE+'/stl/bottom-half.stl'+TS, top: STL_BASE+'/stl/top-half.stl'+TS, flat: STL_BASE+'/stl/flat-both.stl'+TS };
+const URLS = { bottom: STL_BASE+'/stl/bottom-half.stl'+TS, top: STL_BASE+'/stl/top-half.stl'+TS, flat: STL_BASE+'/stl/flat.stl'+TS };
 document.getElementById('dl-bottom').href = URLS.bottom;
 document.getElementById('dl-top').href = URLS.top;
 document.getElementById('dl-flat').href = URLS.flat;
