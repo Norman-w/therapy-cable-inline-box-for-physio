@@ -18,13 +18,16 @@
 
 本版将围绕调速器模组的外形、接线与壳体布局重新设计（尺寸与内部结构预计与 v1 不同）。
 
-选用模组与尺寸资料见：[docs/synairy-esc-adaptor-v02/](docs/synairy-esc-adaptor-v02/)（Synairy ESC-Adaptor V02，PCB **32 × 12 mm**）。
+选用模组与尺寸资料：
+
+- 总览：[docs/synairy-esc-adaptor-v02/](docs/synairy-esc-adaptor-v02/)
+- **尺寸与开孔**：[docs/synairy-esc-adaptor-v02/dimensions.md](docs/synairy-esc-adaptor-v02/dimensions.md)
 
 ### v2 壳体要点
 
-- 内腔约 **70 × 22 × 15 mm**（上半净高 7.5 给旋钮柱；加长避免罗马柱与线缆立柱冲突）
-- 壳外 **4× M2** 四角合盖；盒内 **2× 罗马柱** 锁 PCB
-- 开窗：轴在板左 10~15（⌀5.2）、数码管 18.5~27 且长边 12；二者板宽居中；开关不开孔
+- 内腔 **70 × 22 × 15 mm**（上半净高 7.5；加长避让线缆立柱）
+- 壳外 **4× M2** 合盖；盒内 **2× 罗马柱** 锁 PCB
+- 开窗：轴 10~15（⌀5.2）、数码管 18.5~27（8.5×12）；板宽居中；开关不开孔
 
 ## 仓库结构
 
